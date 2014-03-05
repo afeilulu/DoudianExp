@@ -1,17 +1,14 @@
 package cn.com.xinli.android.doudian.utils;
 
-import java.util.List;
-
-import android.app.ActionBar.LayoutParams;
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.widget.BaseAdapter;
-import android.widget.FrameLayout;
 import android.widget.TextView;
+
+import java.util.List;
+
 import cn.com.xinli.android.doudian.R;
 
 public class FilterAdapter extends BaseAdapter {

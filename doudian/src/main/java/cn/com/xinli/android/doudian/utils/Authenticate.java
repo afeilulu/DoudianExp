@@ -1,5 +1,8 @@
 package cn.com.xinli.android.doudian.utils;
 
+import android.text.TextUtils;
+import android.util.Log;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -15,9 +18,6 @@ import java.util.List;
 
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
-
-import android.text.TextUtils;
-import android.util.Log;
 
 public class Authenticate {
 	private static final String TAG = "Authenticate";

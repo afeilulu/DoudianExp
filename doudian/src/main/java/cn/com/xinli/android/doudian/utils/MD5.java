@@ -1,5 +1,7 @@
 package cn.com.xinli.android.doudian.utils;
 
+import android.util.Log;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -7,8 +9,6 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-
-import android.util.Log;
 
 public class MD5 {
     static String TAG = "MD5";

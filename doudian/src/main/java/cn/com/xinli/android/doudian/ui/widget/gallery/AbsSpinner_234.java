@@ -16,7 +16,6 @@ package cn.com.xinli.android.doudian.ui.widget.gallery;
  * limitations under the License.
  */
 
-import cn.com.xinli.android.doudian.R;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.database.DataSetObserver;
@@ -29,6 +28,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.SpinnerAdapter;
+
+import cn.com.xinli.android.doudian.R;
 
 /**
  * An abstract base class for spinner widgets. SDK users will probably not need to use this class.

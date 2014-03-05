@@ -1,14 +1,14 @@
 package cn.com.xinli.android.doudian.utils;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.util.Log;
+import android.util.LruCache;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.util.LruCache;
-import android.util.Log;
 
 public class BitmapManager {
 	private static final String TAG = "BitmapManager";

@@ -22,8 +22,15 @@ import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.ContextMenu.ContextMenuInfo;
-import android.view.*;
-import android.view.View.OnKeyListener;
+import android.view.GestureDetector;
+import android.view.Gravity;
+import android.view.HapticFeedbackConstants;
+import android.view.KeyEvent;
+import android.view.MotionEvent;
+import android.view.SoundEffectConstants;
+import android.view.View;
+import android.view.ViewConfiguration;
+import android.view.ViewGroup;
 import android.view.animation.Transformation;
 
 import java.lang.ref.SoftReference;

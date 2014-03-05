@@ -1,6 +1,6 @@
 package cn.com.xinli.android.doudian.utils;
 
-import java.util.*;
+import java.util.ArrayList;
 
 public class SpiltProgramsList {
 	// 游标初始指向中间

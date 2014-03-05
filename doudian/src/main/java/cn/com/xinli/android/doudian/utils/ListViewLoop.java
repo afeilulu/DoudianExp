@@ -4,8 +4,8 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnKeyListener;
 import android.widget.AdapterView;
-import android.widget.ListView;
 import android.widget.AdapterView.OnItemSelectedListener;
+import android.widget.ListView;
 
 public class ListViewLoop {
 	private ListView mListView;

@@ -1,5 +1,7 @@
 package cn.com.xinli.android.doudian.utils;
 
+import android.util.Log;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -7,13 +9,12 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
+
 import cn.com.xinli.android.doudian.io.ProbeEpisode;
 import cn.com.xinli.android.doudian.io.ProbeSectionUri;
-import java.net.URLEncoder;
-import android.content.Context;
-import android.util.Log;
 public class VideoPlayerHepper {
 	
 	public final  static String PROBE_URI = "http://127.0.0.1:8089/videositeproxy/probe";
