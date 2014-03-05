@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" 
+        android:orientation="vertical"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="40dp"
+        >
+        <ProgressBar
+            android:id="@+id/progress"
+            style="@android:style/Widget.ProgressBar.Horizontal"
+            android:layout_width="600dp"
+            android:layout_height="wrap_content" 
+            android:layout_gravity="center"
+            android:progressDrawable="@drawable/barcolor"
+            android:max="100"/>
+      <LinearLayout
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="match_parent"
+            android:layout_height="85dp"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:orientation="horizontal" 
+            >
+
+            <Button
+                android:id="@+id/btn_canel"
+                android:layout_marginTop="20dp"
+                android:layout_width="120dp"
+                android:layout_height="60dp"
+                android:visibility="gone" 
+                android:layout_marginRight="80dp"
+                android:layout_gravity="center"
+                android:background="@drawable/btn_bg_style"
+                android:padding="0dp"
+                android:nextFocusUp="@+id/btn_canel"
+                android:nextFocusDown="@+id/btn_canel"
+                android:nextFocusLeft="@+id/btn_canel"
+                android:nextFocusRight="@+id/btn_enter"
+                android:text="@string/chanel_install"
+                android:textColor="@color/white"
+                android:textStyle="bold" />
+            
+            <TextView
+            android:id="@+id/hint"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:layout_marginTop="20dp"
+            android:textColor="@android:color/white"
+            android:textSize="32dp" />
+            <Button
+                android:id="@+id/btn_enter"
+                android:layout_width="120dp"
+                android:layout_height="60dp"
+                android:layout_marginTop="20dp"
+                android:visibility="gone" 
+                android:layout_marginLeft="80dp"
+                android:layout_gravity="center"
+                android:background="@drawable/btn_bg_style"
+                android:padding="0dp"
+                android:nextFocusUp="@+id/btn_enter"
+                android:nextFocusDown="@+id/btn_enter"
+                android:nextFocusLeft="@+id/btn_canel"
+                android:nextFocusRight="@+id/btn_enter"
+                android:text="@string/enter_install"
+                android:textColor="@color/white"
+                android:textStyle="bold" />
+            
+        </LinearLayout>
+    </LinearLayout>
+
+</RelativeLayout>

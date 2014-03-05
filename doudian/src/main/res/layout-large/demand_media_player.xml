@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/layout_video_view"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/mediaplay_bg" >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center" >
+
+        <cn.com.xinli.android.doudian.ui.tv.DemandMediaPlayerView
+            android:id="@+id/mediaPlayerView"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:gravity="center"
+            android:visibility="gone" />
+    </LinearLayout>
+    
+     <include layout="@layout/buffer_press" />
+
+    <LinearLayout
+        android:id="@+id/lay_progress_bar"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:background="@android:color/transparent"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:visibility="gone" >
+
+        <ProgressBar
+            android:id="@+id/vidio_progress_bar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:indeterminateDrawable="@drawable/progress_style"
+            android:background="@android:color/transparent"/>
+        <TextView
+                android:id="@+id/progress_quality_info"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:focusable="false"
+                android:focusableInTouchMode="false"
+                android:gravity="center"
+                android:layout_gravity="center"
+                android:layout_marginTop="50dp"
+                android:textColor="@color/blue"
+                android:textSize="20sp"
+                android:visibility="gone" />
+        
+        <TextView
+                android:id="@+id/vidio_progress_info"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:focusable="false"
+                android:focusableInTouchMode="false"
+                android:gravity="center"
+                android:layout_gravity="center"
+                android:layout_marginTop="20dp"
+                android:textColor="@color/blue"
+                android:textSize="20sp" />
+        
+         <LinearLayout
+             android:id="@+id/vidio_progress_help_lay"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+                android:layout_gravity="center"
+                android:layout_marginTop="20dp"
+            android:orientation="horizontal" 
+            android:visibility="invisible">
+
+            <ImageView
+                android:id="@+id/vidio_progress_pic"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:focusable="false"
+                android:focusableInTouchMode="false"
+                android:gravity="center"
+                android:src="@drawable/buttom_panel_help" />
+
+            <TextView
+                android:id="@+id/vidio_progress_help"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dip"
+                android:focusable="false"
+                android:focusableInTouchMode="false"
+                android:gravity="center|left"
+                android:textColor="@color/blue"
+                android:textSize="20sp" />
+        </LinearLayout>
+        
+        
+    </LinearLayout>
+    
+    <ImageView
+         android:id="@+id/vidio_pause"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:focusable="false"
+         android:focusableInTouchMode="false"
+         android:layout_gravity="center"
+         android:src="@drawable/pause"
+         android:visibility="gone"/>
+
+    
+    <include layout="@layout/demand_player_left_panel_content" />
+    
+    <include layout="@layout/demand_player_bottom_panel_content" />
+    
+    
+    <include layout="@layout/player_control_progress" />
+    
+   
+
+
+</FrameLayout>

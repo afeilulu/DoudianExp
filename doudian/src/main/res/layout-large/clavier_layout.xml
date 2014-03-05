@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/key_view"
+    android:layout_width="150dp"
+    android:layout_height="150dp"
+    android:layout_margin="0dp"
+    android:background="@drawable/clavier_background"
+    android:orientation="vertical"
+    android:padding="0dp" >
+
+    <ImageButton
+        android:id="@+id/key_OK"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:layout_marginBottom="12dp"
+        android:layout_marginLeft="22dp"
+        android:layout_marginRight="22dp"
+        android:layout_marginTop="12dp"
+        android:background="@android:color/transparent"
+        android:contentDescription="@string/search_desc"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:padding="0dp"
+        android:src="@drawable/clavier"
+        android:textColor="@android:color/white" >
+    </ImageButton>
+
+    <TextView
+        android:id="@+id/key_top"
+        style="@style/Text_Clavier"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/key_OK"
+        android:layout_centerHorizontal="true"
+        android:layout_margin="0dp"
+        android:padding="0dp"
+        android:textColor="@color/blue_default" />
+
+    <TextView
+        android:id="@+id/key_left"
+        style="@style/Text_Clavier"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_margin="0dp"
+        android:layout_toLeftOf="@id/key_OK"
+        android:padding="0dp"
+        android:textColor="@color/blue_default" />
+
+    <TextView
+        android:id="@+id/key_right"
+        style="@style/Text_Clavier"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_margin="0dp"
+        android:layout_toRightOf="@id/key_OK"
+        android:padding="0dp"
+        android:textColor="@color/blue_default" />
+
+    <TextView
+        android:id="@+id/key_botton"
+        style="@style/Text_Clavier"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/key_OK"
+        android:layout_centerHorizontal="true"
+        android:layout_margin="0dp"
+        android:padding="0dp"
+        android:textColor="@color/blue_default" />
+
+</RelativeLayout>

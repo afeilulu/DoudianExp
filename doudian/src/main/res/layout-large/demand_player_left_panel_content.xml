@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?>
+<cn.com.xinli.android.doudian.utils.Panel xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:panel="http://schemas.android.com/apk/res/cn.com.xinli.android.doudian"
+    android:id="@+id/leftPanel"
+    android:layout_width="wrap_content"
+    android:layout_height="fill_parent"
+    android:layout_gravity="left"
+    panel:animationDuration="1000"
+    panel:closedHandle="@drawable/transparent"
+    panel:content="@+id/panelLeftContent"
+    panel:handle="@+id/panelLeftHandle"
+    panel:openedHandle="@drawable/transparent"
+    panel:position="left"
+    panel:weight="26%p" >
+
+    <!--
+    panel:openedHandle="@drawable/left_switcher_expanded_background"
+    panel:closedHandle="@drawable/left_switcher_collapsed_background"
+    -->
+
+    <Button
+        android:id="@+id/panelLeftHandle"
+        android:layout_width="0dip"
+        android:layout_height="0dp"
+        android:layout_gravity="top"
+        android:layout_marginLeft="-5dip"
+        android:layout_marginTop="15dip"
+        android:focusable="false"
+        android:focusableInTouchMode="false" />
+
+    <LinearLayout
+        android:id="@+id/panelLeftContent"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_gravity="top|center"
+        android:background="@drawable/vertical_bg"
+        android:orientation="vertical" >
+ <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="0dp"
+            android:layout_weight="0.12"
+            android:orientation="horizontal" >
+        <cn.com.xinli.android.doudian.ui.tv.ScrollingTextView
+                android:id="@+id/program_name"
+                android:layout_width="250dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:ellipsize="marquee"
+        		android:marqueeRepeatLimit="marquee_forever"
+        		android:singleLine="true"
+                android:gravity="center"
+                android:layout_marginLeft="30dp"
+                android:textColor="@color/blue"
+                android:textSize="25sp" />
+         </LinearLayout>
+ 	<LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="0dp"
+            android:layout_weight="0.53"
+            android:orientation="horizontal" >
+        <ListView
+            android:id="@+id/video_programs"
+            android:layout_gravity="center"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:fadingEdgeLength="70dp"
+            android:nextFocusUp="@+id/video_programs"
+            android:nextFocusDown="@+id/video_programs"
+            android:requiresFadingEdge="vertical"
+            android:cacheColorHint="#00000000" />
+</LinearLayout>
+<LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="0dp"
+            android:layout_weight="0.1"
+            android:orientation="horizontal" >
+
+            <ImageView
+                android:id="@+id/quality_left"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginLeft="55dip"
+                android:focusable="false"
+                android:focusableInTouchMode="false"
+                android:src="@drawable/left" />
+
+            <TextView
+                android:id="@+id/quality_name"
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dip"
+                android:layout_gravity="center"
+                android:focusable="false"
+                android:focusableInTouchMode="false"
+                android:gravity="center"
+                android:textColor="@color/white"
+                android:textSize="25sp" />
+
+            <ImageView
+                android:id="@+id/quality_right"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dip"
+                android:layout_gravity="center"
+                android:focusable="false"
+                android:focusableInTouchMode="false"
+                android:gravity="center"
+                android:src="@drawable/right" />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="0dp"
+            android:layout_weight="0.05"
+            android:layout_marginBottom="7dp"
+            android:orientation="horizontal" >
+
+            <TextView
+                android:id="@+id/panel_control_help_str"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="45dip"
+                android:layout_gravity="center"
+                android:focusable="false"
+                android:focusableInTouchMode="false"
+                android:gravity="center"
+                android:textColor="@color/white"
+                android:text="@string/video_list_help"
+                android:textSize="20sp" />
+
+        </LinearLayout>
+    </LinearLayout>
+
+</cn.com.xinli.android.doudian.utils.Panel>

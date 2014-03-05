@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="5dp" >
+
+    <RelativeLayout
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:padding="0dp"
+	    android:layout_weight="1" >
+        <ImageView
+            android:id="@+id/card_image"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center_horizontal"
+            android:scaleType="centerCrop" />
+        
+        <TextView
+	        android:id="@+id/card_update"
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:layout_alignParentBottom="true"
+	        android:layout_centerHorizontal="true"
+	        android:textSize="20sp"
+	        android:layout_gravity="center"
+	        android:gravity="center"
+	        android:singleLine="true"
+	        android:ellipsize="marquee"
+	        android:textColor="@android:color/white" />
+    </RelativeLayout>
+        
+    <TextView
+        android:id="@+id/card_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="20sp"
+        android:layout_gravity="center"
+        android:singleLine="true"
+        android:ellipsize="marquee"
+        android:layout_weight="0"
+        android:textColor="@android:color/black" />
+
+</LinearLayout>

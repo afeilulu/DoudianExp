@@ -1,0 +1,109 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="cn.com.xinli.android.doudian" >
+
+    <uses-feature
+        android:name="android.hardware.touchscreen"
+        android:required="false" >
+    </uses-feature>
+
+    <supports-screens android:largeScreens="true" />
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <!--<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />-->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_SETTINGS" />
+
+    <application
+        android:hardwareAccelerated="true"
+        android:icon="@drawable/panoramio_logo"
+        android:label="@string/app_name"
+        android:largeHeap="true" >
+
+        <activity
+            android:name="cn.com.xinli.android.doudian.ui.WelcomeActivity"
+            android:noHistory="true"
+            android:theme="@style/Theme.NoTitleBar.Fullscreen.Startup" >
+            <intent-filter>
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="cn.com.xinli.android.doudian.ui.tv.HomeBlueActivity"
+            android:theme="@style/Theme.NoTitleBar.Fullscreen" >
+            <intent-filter>
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <action android:name="android.intent.action.MAIN" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="cn.com.xinli.android.doudian.ui.tv.RecommendActivity"
+            android:launchMode="singleTop"
+            android:theme="@style/Theme.NoTitleBar.Fullscreen" >
+            <intent-filter>
+                <action android:name="cn.com.xinli.android.doudian.ui.tv.RecommendActivity" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="cn.com.xinli.android.doudian.ui.tv.SearchActivity"
+            android:label="@string/title_activity_home"
+            android:launchMode="singleTask"
+            android:theme="@style/Theme.NoTitleBar.Fullscreen" >
+            <intent-filter>
+                <action android:name="cn.com.xinli.android.doudian.ui.tv.SearchActivity" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="cn.com.xinli.android.doudian.ui.tv.DetailActivity"
+            android:label="@string/title_activity_home"
+            android:launchMode="singleTop"
+            android:theme="@style/Theme.NoTitleBar.Fullscreen" >
+            <intent-filter>
+                <action android:name="cn.com.xinli.android.doudian.ui.tv.DetailActivity" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name="cn.com.xinli.android.doudian.ui.tv.PlayerActivity"
+            android:launchMode="singleTop"
+            android:theme="@style/Theme.NoTitleBar.Fullscreen.NoBackground" >
+            <intent-filter>
+                <action android:name="cn.com.xinli.android.doudian.ui.tv.PlayerActivity" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <service android:name=".service.GetProgramRelated" />
+        <service android:name=".service.GetCategories" />
+        <service android:name=".service.GetTotalOfNormalChannels" />
+        <service android:name=".service.GetTotalOfSpecialChannels" />
+        <service android:name=".service.GetNormalChannelsByPage" />
+        <service android:name=".service.GetSpecialChannelsByPage" />
+        <service android:name=".service.GetProgramByPage" />
+        <service android:name=".service.GetProgramDetail" />
+        <service android:name=".service.GetProgramEpisodesByPage" />
+        <service android:name=".service.GetProgramInCategoryByPage" />
+        <service android:name=".service.GetProgramInAreaCategoryByPage" />
+        <service android:name=".service.GetProgramInAreaByPage" />
+        <service android:name=".service.GetProgramSources" />
+        <service android:name=".service.GetTotalInAreaCategory" />
+        <service android:name=".service.GetTotalInArea" />
+        <service android:name=".service.GetTotalInCategory" />
+        <service android:name=".service.GetTotal" />
+        <service android:name=".service.GetYears" />
+        <service android:name=".service.GetAreas" />
+    </application>
+
+</manifest>

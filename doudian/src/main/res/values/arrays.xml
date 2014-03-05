@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<resources>
+    <array name="mydoudian">
+        <item>@string/mypersuit</item>
+        <item>@string/myfavorite</item>
+        <item>@string/recent_look</item>
+    </array>
+    
+</resources>

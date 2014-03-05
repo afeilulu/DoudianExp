@@ -1,0 +1,42 @@
+<!-- Copyright (C) 2011 The Android Open Source Project
+
+     Licensed under the Apache License, Version 2.0 (the "License");
+     you may not use this file except in compliance with the License.
+     You may obtain a copy of the License at
+
+          http://www.apache.org/licenses/LICENSE-2.0
+
+     Unless required by applicable law or agreed to in writing, software
+     distributed under the License is distributed on an "AS IS" BASIS,
+     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     See the License for the specific language governing permissions and
+     limitations under the License.
+-->
+<resources>
+        <color name="translucent_black">#99000000</color>
+        <color name="tile_background">#88000000</color>
+        <color name="dialog_background">#bb000000</color>
+        <color name="mediaplay_bg">#000000</color>
+        <color name="dialog_bgcolor">#0e0e0e</color>
+        <color name="detail_split">#3e3d3d</color>
+        <color name="blue">#00ADF8</color>
+	    <color name="white">#C8C8C8</color>
+	    <color name="gray">#75AADE</color>
+	    <color name="black">#1b1b1b</color>
+	    <color name="green">#25B400</color>
+	    <color name="red">#ff5b29</color>
+	    <color name="detail_gray">#a8a7a7</color>
+	    <color name="salf_transparent">#e0000000</color>
+	    <color name="transparent">#00000000</color>
+	    <color name="orange">#ff815a</color>
+	    <color name="time_default">#f4f1f1</color>
+	    <color name="blue_default">#014983</color>
+	    <color name="search_text_color">#0c4f84</color>
+	    <color name="tab_base_line">#0161ad</color>
+        <color name="poster_text">#003967</color>
+        <color name="tab_nav_text_unselected">#65b3fe</color>
+
+        <color name="black_overlay">#66000000</color>
+        <color name="white_overlay">#66ffffff</color>
+        <color name="duration">#374457</color>
+</resources>

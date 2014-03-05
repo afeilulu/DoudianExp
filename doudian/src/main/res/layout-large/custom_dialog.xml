@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout 
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@drawable/custom_dialog_background"
+    android:orientation="horizontal"
+    android:padding="@dimen/body_padding_super">
+    
+    <ImageView 
+        android:id="@+id/item_delete"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:layout_margin="@dimen/body_padding_super"
+        android:src="@drawable/custom_dialog_btn_delete_item"
+        android:focusable="true"
+        android:focusableInTouchMode="true"/>
+    
+    <ImageView 
+        android:id="@+id/all_item_delete"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:layout_margin="@dimen/body_padding_super"
+        android:src="@drawable/custom_dialog_btn_delete_all"
+        android:focusable="true"
+        android:focusableInTouchMode="true"/>
+    
+    <ImageView 
+        android:id="@+id/dialog_cancel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:layout_margin="@dimen/body_padding_super"
+        android:src="@drawable/custom_dialog_btn_return"
+        android:focusable="true"
+        android:focusableInTouchMode="true"/>
+</LinearLayout>

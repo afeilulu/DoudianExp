@@ -1,0 +1,116 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/search_work"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:baselineAligned="false"
+    android:orientation="horizontal" >
+
+    <LinearLayout
+        android:id="@+id/search_left"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_weight="5"
+        android:orientation="vertical" >
+
+        <TextView
+            android:id="@+id/search_text"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/search_text"
+            android:drawableRight="@drawable/search_text_icon"
+            android:ellipsize="end"
+            android:gravity="center_vertical"
+            android:hint="@string/search_hint_text"
+            android:maxLength="16"
+            android:paddingBottom="0dp"
+            android:paddingLeft="10dp"
+            android:paddingRight="0dp"
+            android:paddingTop="0dp"
+            android:singleLine="true"
+            android:textColor="@color/search_text_color"
+            android:textSize="@dimen/detail_content" />
+
+        <GridView
+            android:id="@+id/key_set"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
+            android:horizontalSpacing="1dp"
+            android:nextFocusLeft="@id/key_set"
+            android:numColumns="3"
+            android:stretchMode="columnWidth"
+            android:verticalSpacing="20dp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/search_right"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_marginLeft="10dp"
+        android:layout_weight="4"
+        android:orientation="vertical"
+        android:padding="0dp" >
+
+        <LinearLayout
+            android:id="@+id/search_foot"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/result_title"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:padding="0dp" >
+
+            <TextView
+                android:id="@+id/show_desc"
+                style="@style/Text_Detail_Title"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="40dp"
+                android:layout_weight="1"
+                android:gravity="left"
+                android:text="@string/search_desc"
+                android:textColor="@color/blue_default"
+                android:textSize="@dimen/detail_name" />
+
+            <TextView
+                android:id="@+id/show_line"
+                style="@style/Text_Detail_Title"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:gravity="right"
+                android:textColor="@color/blue_default"
+                android:textSize="@dimen/detail_name"
+                android:visibility="invisible" />
+
+            <TextView
+                android:id="@+id/show_total"
+                style="@style/Text_Detail_Title"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:textColor="@color/blue_default"
+                android:textSize="@dimen/detail_name" />
+        </LinearLayout>
+
+        <ListView
+            android:id="@+id/search_result_list"
+            android:layout_width="fill_parent"
+            android:layout_height="450dp"
+            android:layout_marginLeft="15dp"
+            android:background="@drawable/result_list"
+            android:divider="@null"
+            android:fadingEdgeLength="100dp"
+            android:listSelector="@drawable/search_selector"
+            android:nextFocusRight="@id/search_result_list"
+            android:paddingBottom="10dp"
+            android:paddingLeft="0dp"
+            android:paddingRight="0dp"
+            android:paddingTop="10dp"
+            android:requiresFadingEdge="vertical" >
+        </ListView>
+    </LinearLayout>
+
+</LinearLayout>

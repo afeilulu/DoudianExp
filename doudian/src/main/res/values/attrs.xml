@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<resources>
+       <!-- These are the attributes that we want to retrieve from the theme
+         in view/Gallery1.java -->
+    <declare-styleable name="Gallery1">
+        <attr name="android:galleryItemBackground" />
+    </declare-styleable>
+    
+    <declare-styleable name="FragmentArguments">
+        <attr name="android:label" />
+    </declare-styleable>
+    
+    <declare-styleable name="GifView">
+	    <attr name="src" format="reference" />
+	</declare-styleable>
+	
+    <declare-styleable name="Gallery">
+        <attr name="android:galleryItemBackground" />
+        <attr name="android:gravity" />
+        <attr name="android:animationDuration" />
+        <attr name="android:spacing" />
+        <attr name="android:unselectedAlpha" />
+    </declare-styleable>
+    
+    <declare-styleable name="AbsSpinner">
+        <attr name="android:entries" />
+    </declare-styleable>
+    
+    <!-- Adapter used to bind cursors. -->
+    <declare-styleable name="CursorAdapter">
+        <!-- URI to get the cursor from. Optional. -->
+        <attr name="uri" format="string" />
+        <!-- Selection statement for the query. Optional. -->
+        <attr name="selection" format="string" />
+        <!-- Sort order statement for the query. Optional. -->
+        <attr name="sortOrder" format="string" />
+        <!-- Layout resource used to display each row from the cursor. Mandatory. -->
+        <attr name="layout" format="reference" />
+    </declare-styleable>
+
+    <!-- Attributes used in bind items for XML cursor adapters. -->
+    <declare-styleable name="CursorAdapter_BindItem">
+        <!-- The name of the column to bind from. Mandatory. -->
+        <attr name="from" format="string" />
+        <!-- The resource id of the view to bind to. Mandatory. -->
+        <attr name="to" format="reference" />
+        <!-- The type of binding. If this value is not specified, the type will be
+             inferred from the type of the "to" target view. Mandatory.
+
+             The type can be one of:
+             <ul>
+             <li>string, The content of the column is interpreted as a string.</li>
+             <li>image, The content of the column is interpreted as a blob describing an image.</li>
+             <li>image-uri, The content of the column is interpreted as a URI to an image.</li>
+             <li>drawable, The content of the column is interpreted as a resource id to a drawable.</li>
+             <li>A fully qualified class name, corresponding to an implementation of
+                 android.widget.Adapters.CursorBinder.</li>
+             </ul>
+         -->
+        <attr name="as" format="string" />
+    </declare-styleable>
+
+    <!-- Attributes used in select items for XML cursor adapters.-->
+    <declare-styleable name="CursorAdapter_SelectItem">
+        <!-- The name of the column to select. Mandatory. -->
+        <attr name="column" format="string" />
+    </declare-styleable>
+
+    <!-- Attributes used to map values to new values in XML cursor adapters' bind items. -->
+    <declare-styleable name="CursorAdapter_MapItem">
+        <!-- The original value from the column. Mandatory. -->
+        <attr name="fromValue" format="string" />
+        <!-- The new value from the column. Mandatory. -->
+        <attr name="toValue" format="string" />
+    </declare-styleable>
+
+    <!-- Attributes used to map values to new values in XML cursor adapters' bind items. -->
+    <declare-styleable name="CursorAdapter_TransformItem">
+        <!-- The transformation expression. Mandatory if "withClass" is not specified. -->
+        <attr name="withExpression" format="string" />
+        <!-- The transformation class, an implementation of
+             android.widget.Adapters.CursorTransformation. Mandatory if "withExpression"
+             is not specified. -->
+        <attr name="withClass" format="string" />
+    </declare-styleable>
+    
+    <declare-styleable name="AppTheme">
+        <attr name="actionbarCompatButtonStyle" format="reference" />
+        <attr name="actionbarCompatProgressIndicatorStyle" format="reference" />
+        <attr name="actionbarCompatSeparatorStyle" format="reference" />
+        <attr name="actionbarCompatLogoStyle" format="reference" />
+        <attr name="actionbarCompatTextStyle" format="reference" />
+        <attr name="textHeaderMaxLines" format="integer" />
+        <attr name="trackAbstractMaxLines" format="integer" />
+    </declare-styleable>
+
+    <declare-styleable name="BlocksLayout">
+        <attr name="columns" format="integer" />
+    </declare-styleable>
+
+    <declare-styleable name="TimeRulerView">
+        <attr name="headerWidth" format="dimension" />
+        <attr name="hourHeight" format="dimension" />
+        <attr name="horizontalDivider" format="boolean" />
+        <attr name="labelTextSize" format="dimension" />
+        <attr name="labelPaddingLeft" format="dimension" />
+        <attr name="labelColor" format="color" />
+        <attr name="dividerColor" format="color" />
+        <attr name="startHour" format="integer" />
+        <attr name="endHour" format="integer" />
+    </declare-styleable>
+
+    <declare-styleable name="BezelImageView">
+        <attr name="maskDrawable" format="reference" />
+        <attr name="borderDrawable" format="reference" />
+    </declare-styleable>
+
+    <!-- Auto hide Panel -->
+    <declare-styleable name="Panel">
+        <!-- Defines panel animation duration in ms. -->
+        <attr name="animationDuration" format="integer" />
+        <!-- Defines panel position on the screen. -->
+        <attr name="position">
+        	<!-- Panel placed at top of the screen. -->
+            <enum name="top" value="0" />
+            <!-- Panel placed at bottom of the screen. -->
+            <enum name="bottom" value="1" />
+            <!-- Panel placed at left of the screen. -->
+            <enum name="left" value="2" />
+            <!-- Panel placed at right of the screen. -->
+            <enum name="right" value="3" />
+        </attr>
+        <!-- Identifier for the child that represents the panel's handle. -->
+        <attr name="handle" format="reference" />
+        <!-- Identifier for the child that represents the panel's content. -->
+        <attr name="content" format="reference" />
+        <!-- Defines if flying gesture forces linear interpolator in animation. -->
+        <attr name="linearFlying" format="boolean" />
+        <!-- Defines size relative to parent (must be in form: nn%p). -->
+        <attr name="weight" format="fraction" />
+        <!-- Defines opened handle (drawable/color). -->
+        <attr name="openedHandle" format="reference|color" />
+        <!-- Defines closed handle (drawable/color). -->
+        <attr name="closedHandle" format="reference|color" />
+    </declare-styleable>
+
+    <!-- Declare custom theme attributes that allow changing which styles are
+         used for button bars depending on the API level.
+         ?android:attr/buttonBarStyle is new as of API 11 so this is
+         necessary to support previous API levels. -->
+    <declare-styleable name="ButtonBarContainerTheme">
+        <attr name="metaButtonBarStyle" format="reference" />
+        <attr name="metaButtonBarButtonStyle" format="reference" />
+    </declare-styleable>
+
+</resources>

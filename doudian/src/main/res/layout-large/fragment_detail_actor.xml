@@ -1,0 +1,61 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical"
+    android:paddingBottom="100dp"
+    android:paddingLeft="100dp"
+    android:paddingRight="100dp"
+    android:paddingTop="100dp" >
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:baselineAligned="false"
+        android:orientation="horizontal" >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="0"
+            android:background="@drawable/main_top_text"
+            android:drawableLeft="@drawable/btn_actor"
+            android:drawablePadding="10dp"
+            android:gravity="center_vertical"
+            android:text="@string/detail_actor"
+            android:textSize="@dimen/detail_name"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/actor_work"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:baselineAligned="false"
+        android:orientation="horizontal" >
+
+        <ListView
+            android:id="@+id/actor_list"
+            android:layout_width="fill_parent"
+            android:layout_height="400dp"
+            android:layout_weight="2"
+            android:background="@drawable/dialog_backgroup"
+            android:divider="@null"
+            android:listSelector="@drawable/listview_selector_two" />
+
+        <ListView
+            android:id="@+id/actor_video"
+            android:layout_width="fill_parent"
+            android:layout_height="400dp"
+            android:layout_weight="1"
+            android:background="@drawable/dialog_backgroup"
+            android:divider="@null"
+            android:listSelector="@drawable/listview_selector_one" />
+    </LinearLayout>
+
+</LinearLayout>

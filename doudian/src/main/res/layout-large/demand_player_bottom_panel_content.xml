@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<cn.com.xinli.android.doudian.utils.Panel xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:panel="http://schemas.android.com/apk/res/cn.com.xinli.android.doudian"
+    android:id="@+id/bottomPanel"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="bottom"
+    panel:animationDuration="1000"
+    panel:closedHandle="@drawable/transparent"
+    panel:content="@+id/panelBottomContent"
+    panel:handle="@+id/panelBottomHandle"
+    panel:openedHandle="@drawable/transparent"
+    panel:position="bottom"
+    panel:weight="10%p" >
+
+    <!--
+    panel:openedHandle="@drawable/right_switcher_expanded_background"
+    panel:closedHandle="@drawable/right_switcher_collapsed_background"
+    -->
+
+    <Button
+        android:id="@+id/panelBottomHandle"
+        android:layout_width="0dip"
+        android:layout_height="0dp"
+        android:layout_marginBottom="-5dip"
+        android:focusable="false"
+        android:focusableInTouchMode="false" />
+
+    <LinearLayout
+        android:id="@+id/panelBottomContent"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:background="@drawable/horizontal_bg"
+        android:orientation="horizontal" >
+
+        <LinearLayout
+            android:id="@+id/panelBottomContentByLeft"
+            android:layout_width="0dp"
+            android:layout_height="fill_parent"
+            android:layout_weight="0.5"
+            android:orientation="horizontal" >
+
+            <cn.com.xinli.android.doudian.ui.tv.ScrollingTextView
+                android:id="@+id/program_info"
+                android:layout_width="300dp"
+                android:layout_height="fill_parent"
+                android:layout_marginLeft="50dip"
+                android:ellipsize="marquee"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:gravity="center|left"
+                android:marqueeRepeatLimit="marquee_forever"
+                android:paddingTop="10dp"
+                android:singleLine="true"
+                android:textSize="30sp" />
+
+            <TextView
+                android:id="@+id/quality_info"
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:layout_gravity="center"
+                android:focusable="false"
+                android:focusableInTouchMode="false"
+                android:layout_marginLeft="70dip"
+                android:gravity="center|left"
+                android:paddingTop="10dp"
+                android:textSize="30sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/panelBottomContentByRight"
+            android:layout_width="0dp"
+            android:layout_height="fill_parent"
+            android:layout_weight="0.5"
+            android:orientation="horizontal" >
+
+            <ImageView
+                android:id="@+id/video_bottom_help_pic"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_gravity="center"
+                android:layout_marginLeft="80dip"
+                android:layout_marginTop="7dp"
+                android:focusable="false"
+                android:focusableInTouchMode="false"
+                android:gravity="center"
+                android:src="@drawable/buttom_panel_help" />
+ <TextView
+                android:id="@+id/video_bottom_help_str_l"
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:layout_marginLeft="10dip"
+                android:focusable="false"
+                android:focusableInTouchMode="false"
+                android:gravity="center|left"
+                android:paddingTop="11dp"
+                android:text="@string/video_bottom_help_l"
+                android:textColor="@color/blue"
+                android:textSize="20sp" />
+  <ImageView
+                android:id="@+id/video_bottom_help_pic_m"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_gravity="center"
+                android:layout_marginTop="7dp"
+                android:layout_marginLeft="2dip"
+                android:focusable="false"
+                android:focusableInTouchMode="false"
+                android:gravity="center"
+                android:src="@drawable/control_menu" />
+            <TextView
+                android:id="@+id/video_bottom_help_str"
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:focusable="false"
+                android:focusableInTouchMode="false"
+                android:gravity="center|left"
+                android:layout_marginLeft="2dip"
+                android:paddingTop="11dp"
+                android:text="@string/video_bottom_help"
+                android:textColor="@color/blue"
+                android:textSize="20sp" />
+        </LinearLayout>
+    </LinearLayout>
+
+</cn.com.xinli.android.doudian.utils.Panel>

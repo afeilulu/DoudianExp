@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+
+    <cn.com.xinli.android.doudian.ui.widget.TappableSurfaceView
+        android:id="@+id/surface"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center" />
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:fitsSystemWindows="true">
+
+        <LinearLayout android:id="@+id/top_panel"
+            style="?metaButtonBarStyle"
+            android:alpha="0.7"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top|center_horizontal"
+            android:background="@color/black_overlay"
+            android:orientation="horizontal"
+            android:layout_alignParentTop="true"
+            tools:ignore="UselessParent">
+
+            <TextView
+                android:id="@+id/name"
+                style="@style/Program_Name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_weight="1"
+                android:text="名称"/>
+
+            <Button android:id="@+id/sizeSelectorButton"
+                style="@style/Button_Player_Menu"
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_weight="0"
+                android:nextFocusLeft="@id/sizeSelectorButton"
+                android:text="@string/player_menu_size" />
+
+            <Button android:id="@+id/qualityButton"
+                style="@style/Button_Player_Menu"
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_weight="0"
+                android:text="@string/player_menu_quality" />
+
+            <Button android:id="@+id/episodeButton"
+                style="@style/Button_Player_Menu"
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_weight="0"
+                android:nextFocusUp="@id/episodeButton"
+                android:nextFocusDown="@id/episodeButton"
+                android:text="@string/player_menu_episode" />
+
+            <Button android:id="@+id/sourceButton"
+                style="@style/Button_Player_Menu"
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_weight="0"
+                android:text="@string/player_menu_source" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/sourcePanel"
+            style="?metaButtonBarStyle"
+            android:alpha="0.7"
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            android:background="@color/black_overlay"
+            android:orientation="vertical"
+            android:layout_alignParentRight="true"
+            android:layout_below="@id/top_panel" >
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/episodePanel"
+            style="?metaButtonBarStyle"
+            android:alpha="0.7"
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="1dp"
+            android:background="@color/black_overlay"
+            android:orientation="vertical"
+            android:layout_below="@id/top_panel"
+            android:layout_toLeftOf="@id/sourcePanel">
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="5dp"
+                android:layout_gravity="center"
+                android:src="@drawable/episode_up"/>
+            <TextView
+                android:id="@+id/episodeIndex"
+                style="@style/Button_Player_Menu_Sub"
+                android:layout_width="150dp"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:gravity="center"/>
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="5dp"
+                android:layout_gravity="center"
+                android:src="@drawable/episode_down"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/qualityPanel"
+            style="?metaButtonBarStyle"
+            android:alpha="0.7"
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="1dp"
+            android:background="@color/black_overlay"
+            android:orientation="vertical"
+            android:layout_below="@id/top_panel"
+            android:layout_toLeftOf="@id/episodePanel">
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/sizeSelectorPanel"
+            style="?metaButtonBarStyle"
+            android:alpha="0.7"
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="1dp"
+            android:background="@color/black_overlay"
+            android:orientation="vertical"
+            android:layout_below="@id/top_panel"
+            android:layout_toLeftOf="@id/qualityPanel">
+
+            <Button
+                android:id="@+id/sizeFull"
+                style="@style/Button_Player_Menu_Sub"
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/player_menu_size_full"
+                android:nextFocusRight="@id/qualityButton" />
+
+            <Button
+                android:id="@+id/sizeRatio"
+                style="@style/Button_Player_Menu_Sub"
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/player_menu_size_ratio"
+                android:nextFocusRight="@id/qualityButton"
+                android:nextFocusDown="@id/sizeRatio"/>
+
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/media"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:src="@drawable/ic_media_pause"
+            android:layout_centerInParent="true"
+            android:visibility="invisible"
+            android:focusable="false"
+            android:focusableInTouchMode="false" />
+
+        <ProgressBar
+            android:id="@+id/waiting"
+            style="?android:attr/progressBarStyleLarge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_gravity="center" />
+
+        <LinearLayout
+            android:id="@+id/bottom_panel"
+            android:layout_height="wrap_content"
+            android:layout_width="fill_parent"
+            android:orientation="horizontal"
+            android:layout_marginLeft="50dp"
+            android:layout_marginRight="50dp"
+            android:background="@drawable/timeline_background"
+            android:layout_alignParentBottom="true"
+            android:visibility="invisible">
+
+            <cn.com.xinli.android.doudian.ui.widget.TransparentThumbSeekBar
+                android:id="@+id/timeline"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="0px"
+                android:layout_weight="1"
+                android:layout_height="20dp"
+                android:layout_gravity="center"
+                android:progressDrawable="@drawable/player_progress_yellow"
+                android:thumb="@drawable/transparent"
+                android:thumbOffset="2dp"
+                android:padding="5px" />
+
+            <TextView
+                android:id="@+id/duration"
+                style="@style/Text_duration"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/progress_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/Text_Large"
+            android:gravity="center"
+            android:background="@drawable/progress_text_bg"
+            android:layout_above="@id/bottom_panel"
+            android:layout_marginBottom="-5dp"
+            android:paddingLeft="5dp"
+            android:paddingRight="5dp"
+            android:visibility="invisible"/>
+
+    </RelativeLayout>
+</FrameLayout>

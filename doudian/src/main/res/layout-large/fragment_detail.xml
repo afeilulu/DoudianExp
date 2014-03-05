@@ -1,0 +1,237 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical"
+    android:padding="0dp" >
+
+    <LinearLayout
+        android:id="@+id/detail_work"
+        android:layout_width="fill_parent"
+        android:layout_height="400dp"
+        android:baselineAligned="false"
+        android:orientation="horizontal"
+        android:paddingBottom="10dp"
+        android:paddingLeft="30dp"
+        android:paddingRight="30dp"
+        android:paddingTop="5dp" >
+
+        <RelativeLayout
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_weight="7"
+            android:background="@drawable/poster_backgroud"
+            android:padding="2dp" >
+
+            <ImageView
+                android:id="@+id/tv_poster"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_centerInParent="true"
+                android:contentDescription="@string/search_desc"
+                android:padding="2dp"
+                android:scaleType="fitCenter" />
+
+            <TextView
+                android:id="@+id/tv_present"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_centerHorizontal="true"
+                android:alpha="0.8"
+                android:background="@color/black"
+                android:gravity="center_horizontal"
+                android:textColor="@color/white"
+                android:textSize="@dimen/detail_button"
+                android:visibility="invisible" />
+        </RelativeLayout>
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_marginLeft="20dp"
+            android:layout_weight="2"
+            android:orientation="vertical" >
+
+            <RelativeLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content" >
+
+                <LinearLayout
+                    android:id="@+id/detail_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignParentTop="true"
+                    android:orientation="horizontal"
+                    android:padding="0dp" >
+
+                    <Button
+                        android:id="@+id/btn_play"
+                        style="@style/Button_Black"
+                        android:layout_width="180dp"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/detail_button_selector"
+                        android:clickable="false"
+                        android:drawableLeft="@drawable/btn_play"
+                        android:nextFocusLeft="@id/btn_play"
+                        android:text="@string/detail_play"
+                        android:textColor="@color/blue_default" />
+
+                   <!-- <Button
+                        android:id="@+id/btn_actor"
+                        style="@style/Button_Black"
+                        android:layout_width="180dp"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/detail_button_selector"
+                        android:clickable="false"
+                        android:drawableLeft="@drawable/btn_actor_disable"
+                        android:focusable="false"
+                        android:focusableInTouchMode="false"
+                        android:text="@string/detail_actor"
+                        android:textColor="@color/gray" />-->
+
+                    <Button
+                        android:id="@+id/btn_favorite"
+                        style="@style/Button_Black"
+                        android:layout_width="180dp"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/detail_button_selector"
+                        android:drawableLeft="@drawable/btn_favorite_disable"
+                        android:nextFocusRight="@id/btn_favorite"
+                        android:text="@string/detail_favorite"
+                        android:textColor="@color/blue_default" />
+                </LinearLayout>
+
+                <RatingBar
+                    android:id="@+id/star_score"
+                    style="@android:style/Widget.Holo.RatingBar.Small"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentTop="true"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginRight="20dp"
+                    android:layout_marginTop="10dp"
+                    android:background="@android:color/transparent"
+                    android:isIndicator="true"
+                    android:max="10"
+                    android:numStars="5"
+                    android:paddingBottom="5dp"
+                    android:paddingTop="5dp"
+                    android:progress="0"
+                    android:scaleX="1.5"
+                    android:scaleY="1.5"
+                    android:stepSize="0.5" />
+
+                <TextView
+                    android:id="@+id/tv_score"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignBottom="@id/star_score"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginRight="5dp"
+                    android:layout_toRightOf="@id/star_score"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/detail_content"
+                    android:textStyle="bold" />
+
+                <ImageView
+                    android:id="@+id/tv_hd_flag"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignBottom="@id/star_score"
+                    android:layout_margin="0dp"
+                    android:layout_toRightOf="@id/tv_score"
+                    android:contentDescription="@string/search_desc"
+                    android:padding="0dp"
+                    android:src="@drawable/hd" />
+
+                <TextView
+                    android:id="@+id/tv_time"
+                    style="@style/Text_Detail_content"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:layout_below="@id/star_score" />
+
+                <TextView
+                    android:id="@+id/tv_director"
+                    style="@style/Text_Detail_content"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignLeft="@id/tv_time"
+                    android:layout_below="@id/tv_time" />
+
+                <TextView
+                    android:id="@+id/tv_actor"
+                    style="@style/Text_Detail_content"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignLeft="@id/tv_time"
+                    android:layout_below="@id/tv_director" />
+            </RelativeLayout>
+
+            <TextView
+                android:id="@+id/tv_detail"
+                style="@style/Text_Detail_content"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="10"
+                android:singleLine="false" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="38dp"
+        android:background="@drawable/recommend_division"
+        android:baselineAligned="false"
+        android:orientation="horizontal"
+        android:padding="0dp" >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left"
+            android:layout_marginLeft="30dp"
+            android:layout_weight="1"
+            android:text="@string/detail_recommend"
+            android:textColor="@android:color/white"
+            android:textSize="@dimen/detail_content" />
+
+        <TextView
+            android:id="@+id/recount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right"
+            android:layout_marginRight="30dp"
+            android:layout_weight="1"
+            android:gravity="right"
+            android:textColor="@android:color/white"
+            android:textSize="@dimen/detail_content" />
+    </LinearLayout>
+
+    <FrameLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content" >
+
+        <cn.com.xinli.android.doudian.ui.widget.HorizontalListView.HorizontalVariableListView
+            android:id="@+id/detail_recommend"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:paddingLeft="30dp"
+            android:paddingRight="30dp" >
+        </cn.com.xinli.android.doudian.ui.widget.HorizontalListView.HorizontalVariableListView>
+
+        <ImageView
+            android:id="@+id/focusmask"
+            android:layout_width="10dp"
+            android:layout_height="10dp"
+            android:layout_gravity="center_vertical|center_horizontal"
+            android:background="@drawable/focusmask"
+            android:contentDescription="@string/detail_favorite"
+            android:visibility="invisible" />
+    </FrameLayout>
+
+</LinearLayout>

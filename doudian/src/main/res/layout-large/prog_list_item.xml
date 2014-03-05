@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+   <TextView  xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/prop_name"
+        android:layout_width="280dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:layout_marginTop="10dp"
+        android:ellipsize="marquee"
+        android:marqueeRepeatLimit="marquee_forever"
+        android:singleLine="true"
+        android:gravity="center|left"
+        android:layout_gravity="center"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:paddingTop="12dp"
+        android:paddingBottom="12dp"
+        android:textSize="25sp" />
+    

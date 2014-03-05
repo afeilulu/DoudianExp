@@ -1,0 +1,43 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:paddingTop="@dimen/multipane_half_padding">
+    
+    <HorizontalScrollView 
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:scrollbars="none"
+        android:fadingEdgeLength="100dp"
+        android:requiresFadingEdge="horizontal"
+        android:soundEffectsEnabled="true">
+        <LinearLayout
+           android:id="@+id/channelContainer"
+	       android:layout_width="wrap_content"
+	       android:layout_height="wrap_content"
+	       android:orientation="vertical">
+	       <LinearLayout
+	           android:id="@+id/channelContainerUp"
+	           android:layout_width="wrap_content"
+	           android:layout_height="wrap_content"
+	           android:orientation="horizontal">
+	        </LinearLayout>
+	        <LinearLayout
+	           android:id="@+id/channelContainerDown"
+	           android:layout_width="wrap_content"
+	           android:layout_height="wrap_content"
+	           android:orientation="horizontal">
+	        </LinearLayout>
+        </LinearLayout>
+            
+    </HorizontalScrollView>
+	
+	<ImageView
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_gravity="center"
+        android:scaleType="fitXY"
+        android:layout_marginTop="@dimen/multipane_half_padding"
+        android:src="@drawable/shadow"/>
+	
+</LinearLayout>

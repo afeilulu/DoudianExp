@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+        Copyright (C) 2011 The Android Open Source Project Licensed under the
+        Apache License, Version 2.0 (the "License"); you may not use this file
+        except in compliance with the License. You may obtain a copy of the
+        License at http://www.apache.org/licenses/LICENSE-2.0 Unless required by
+        applicable law or agreed to in writing, software distributed under the
+        License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+        CONDITIONS OF ANY KIND, either express or implied. See the License for
+        the specific language governing permissions and limitations under the
+        License.
+-->
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!--
+    <style name="Widget.ActionBarView_TabText">
+        <item name="android:textAppearance">@android:style/TextAppearance.Medium</item>
+        <item name="android:textColor">@color/leftnav_bar_tab_text_dark</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:ellipsize">end</item>
+    </style>
+    <style name="SplashScreen">
+        <item name="android:padding">0dp</item>
+        <item name="android:windowBackground">@android:color/black</item>
+        <item name="android:windowFrame">@null</item>
+    </style>
+    <style name="ActionBarCompat">
+        <item name="android:id">@id/actionbar_compat</item>
+        <item name="android:layout_width">fill_parent</item>
+        <item name="android:layout_height">@dimen/actionbar_compat_height</item>
+        <item name="android:orientation">horizontal</item>
+        <item name="android:background">@android:color/transparent</item>
+    </style>
+    -->
+
+    <style name="Text_Title">
+        <item name="android:textSize">48sp</item>
+        <item name="android:singleLine">true</item>
+    </style>
+
+    <style name="Text_Large">
+        <item name="android:textAppearance">@android:style/TextAppearance.Large</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:ellipsize">end</item>
+    </style>
+
+    <style name="Text_Tab_Title" parent="Text_Large">
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/tab_indicator_text</item>
+        <!-- <item name="android:textColor">@android:color/tab_indicator_text</item> -->
+    </style>
+
+    <style name="Text_Medium">
+        <item name="android:textAppearance">@android:style/TextAppearance.Medium</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:ellipsize">end</item>
+    </style>
+
+    <style name="Text_Small">
+        <item name="android:textAppearance">@android:style/TextAppearance.Small</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:ellipsize">end</item>
+    </style>
+
+    <style name="Text_Clavier">
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:textSize">35sp</item>
+    </style>
+
+    <style name="PopupAnimation" mce_bogus="1" parent="android:Animation">
+        <item name="android:windowEnterAnimation">@anim/fadingin</item>
+        <item name="android:windowExitAnimation">@anim/fadingout</item>
+    </style>
+
+    <style name="Button_Black">
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">@dimen/detail_button</item>
+        <item name="android:paddingBottom">0dp</item>
+        <item name="android:paddingLeft">25dp</item>
+        <item name="android:paddingRight">25dp</item>
+        <item name="android:paddingTop">0dp</item>
+        <item name="android:drawablePadding">2dp</item>
+    </style>
+	<style name="Text_Detail_Title">
+        <item name="android:textAppearance">@android:style/TextAppearance.Large</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:ellipsize">end</item>
+    </style>
+    <style name="Text_Detail_content">
+        <item name="android:textAppearance">@android:style/TextAppearance.Large</item>
+        <item name="android:textSize">@dimen/detail_content</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:ellipsize">end</item>
+    </style>
+    <style name="Text_Detail_source">
+        <item name="android:textAppearance">@android:style/TextAppearance.Large</item>
+        <item name="android:textSize">@dimen/detail_source</item>
+        <item name="android:background">@drawable/metro_tile</item>
+        <item name="android:drawableLeft">@drawable/btn_source_left</item>
+        <item name="android:drawablePadding">20dp</item>
+        <item name="android:drawableRight">@drawable/btn_source_right</item>
+        <item name="android:paddingBottom">10dp</item>
+        <item name="android:paddingLeft">20dp</item>
+        <item name="android:paddingRight">20dp</item>
+        <item name="android:paddingTop">10dp</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:ellipsize">end</item>
+    </style>
+    
+    <style name="Theme.NoTitleBar.Fullscreen" parent="@android:style/Theme.Holo.NoActionBar.Fullscreen">
+        <item name="android:windowBackground">@drawable/main_background_bitmap</item>
+    </style>
+
+    <style name="Theme.NoTitleBar.Fullscreen.NoBackground" parent="@android:style/Theme.Holo.NoActionBar.Fullscreen">
+        <item name="android:windowBackground">@null</item>
+        <item name="metaButtonBarStyle">?android:attr/buttonBarStyle</item>
+        <item name="metaButtonBarButtonStyle">?android:attr/buttonBarButtonStyle</item>
+    </style>
+
+    <style name="Theme.NoTitleBar.Fullscreen.Startup" parent="@android:style/Theme.Holo.NoActionBar.Fullscreen">
+        <item name="android:windowBackground">@drawable/welcome</item>
+    </style>
+    <style name="Theme.NoTitleBar.Dialog" parent="@android:style/Theme.Holo.Dialog.NoActionBar">
+        <item name="android:windowBackground">@drawable/main_background_bitmap</item>
+    </style>
+
+    <style name="Program_Name">
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">@dimen/program_name</item>
+        <item name="android:padding">10dp</item>
+    </style>
+
+    <style name="Button_Player_Menu">
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">@dimen/player_menu</item>
+        <item name="android:padding">5dp</item>
+        <item name="android:alpha">0.7</item>
+        <item name="android:background">@drawable/player_menu_button_normal</item>
+<!--        <item name="metaButtonBarStyle">?android:attr/buttonBarStyle</item>
+        <item name="metaButtonBarButtonStyle">?android:attr/buttonBarButtonStyle</item>-->
+    </style>
+
+    <style name="Button_Player_Menu_Sub" parent="Button_Player_Menu">
+        <item name="android:textSize">@dimen/player_sub_menu</item>
+        <item name="android:textStyle">normal</item>
+    </style>
+
+    <style name="Text_current_position" parent="Text_Medium">
+        <item name="android:layout_gravity">center</item>
+    </style>
+    <style name="Text_duration" parent="Text_current_position">
+        <item name="android:textColor">@color/duration</item>
+    </style>
+    
+</resources>
