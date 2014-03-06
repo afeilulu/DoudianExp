@@ -13,7 +13,7 @@
     <RelativeLayout
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:fitsSystemWindows="true">
+        android:alpha="0.7">
 
         <LinearLayout android:id="@+id/top_panel"
             style="?metaButtonBarStyle"
@@ -75,31 +75,34 @@
         <LinearLayout
             android:id="@+id/sourcePanel"
             style="?metaButtonBarStyle"
-            android:alpha="0.7"
+            android:alpha="0"
             android:layout_width="150dp"
             android:layout_height="wrap_content"
             android:background="@color/black_overlay"
             android:orientation="vertical"
             android:layout_alignParentRight="true"
-            android:layout_below="@id/top_panel" >
+            android:layout_below="@id/top_panel"
+            android:visibility="gone">
 
         </LinearLayout>
 
         <LinearLayout
             android:id="@+id/episodePanel"
             style="?metaButtonBarStyle"
-            android:alpha="0.7"
+            android:alpha="0"
             android:layout_width="150dp"
             android:layout_height="wrap_content"
-            android:layout_marginRight="1dp"
+            android:layout_marginRight="151dp"
             android:background="@color/black_overlay"
             android:orientation="vertical"
+            android:layout_alignParentRight="true"
             android:layout_below="@id/top_panel"
-            android:layout_toLeftOf="@id/sourcePanel">
+            android:visibility="gone">
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:padding="5dp"
+                android:alpha="0.7"
                 android:layout_gravity="center"
                 android:src="@drawable/episode_up"/>
             <TextView
@@ -112,6 +115,7 @@
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:alpha="0.7"
                 android:padding="5dp"
                 android:layout_gravity="center"
                 android:src="@drawable/episode_down"/>
@@ -121,27 +125,29 @@
         <LinearLayout
             android:id="@+id/qualityPanel"
             style="?metaButtonBarStyle"
-            android:alpha="0.7"
+            android:alpha="0"
             android:layout_width="150dp"
             android:layout_height="wrap_content"
-            android:layout_marginRight="1dp"
+            android:layout_marginRight="302dp"
             android:background="@color/black_overlay"
             android:orientation="vertical"
+            android:layout_alignParentRight="true"
             android:layout_below="@id/top_panel"
-            android:layout_toLeftOf="@id/episodePanel">
+            android:visibility="gone">
         </LinearLayout>
 
         <LinearLayout
             android:id="@+id/sizeSelectorPanel"
             style="?metaButtonBarStyle"
-            android:alpha="0.7"
+            android:alpha="0"
             android:layout_width="150dp"
             android:layout_height="wrap_content"
-            android:layout_marginRight="1dp"
+            android:layout_marginRight="453dp"
             android:background="@color/black_overlay"
             android:orientation="vertical"
+            android:layout_alignParentRight="true"
             android:layout_below="@id/top_panel"
-            android:layout_toLeftOf="@id/qualityPanel">
+            android:visibility="gone">
 
             <Button
                 android:id="@+id/sizeFull"

@@ -76,16 +76,16 @@ public class ControlHider {
      * Hide the system UI.
      */
     public void hide(){
-        mOnVisibilityChangeListener.onVisibilityChange(false);
         mVisible = false;
+        mOnVisibilityChangeListener.onVisibilityChange(mVisible);
     };
 
     /**
      * Show the system UI.
      */
     public void show(){
-        mOnVisibilityChangeListener.onVisibilityChange(true);
         mVisible = true;
+        mOnVisibilityChangeListener.onVisibilityChange(mVisible);
     };
 
     /**

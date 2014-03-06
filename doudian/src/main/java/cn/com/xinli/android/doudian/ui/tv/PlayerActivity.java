@@ -176,6 +176,12 @@ public class PlayerActivity extends BaseActivity implements
                 int index = Integer.parseInt(mTextEpisodeIndex.getText().toString());
                 if (index - 1 != mEpisodeIndex) {
                     mEpisodeIndex = index - 1;
+
+                    timeline.setProgress(0);
+                    mProgresssTextView.setText(seconds2TimeString(0));
+//                  mProgresssTextView.setX(timeline.getSeekBarThumb().getBounds().centerX() + 25);
+                    mProgresssTextView.animate().translationX(timeline.getSeekBarThumb().getBounds().centerX() + 25);
+
                     detect();
                     return;
                 }
