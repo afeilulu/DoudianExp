@@ -15,7 +15,7 @@ import cn.com.xinli.android.doudian.model.Recent;
 /**
  * Created by chen on 1/21/14.
  */
-public class DatabaseHandler extends SQLiteOpenHelper{
+public class DatabaseHandler extends SQLiteOpenHelper {
 
     private static final int DATABASE_VERSION = 1;
 
@@ -32,6 +32,7 @@ public class DatabaseHandler extends SQLiteOpenHelper{
     private static final String KEY_POSTER = "poster";
     private static final String KEY_UPDATE = "updateStatus";
     private static final String KEY_CHANNELID = "channelId";
+    private static final String KEY_TIME_STAMP = "timeStamp";
 
     // recent Table Columns names
     private static final String KEY_SOURCE = "source";
@@ -48,22 +49,25 @@ public class DatabaseHandler extends SQLiteOpenHelper{
         String CREATE_FAVORITES_TABLE = "CREATE TABLE " + TABLE_FAVORITES + " ("
                 + KEY_HASHCODE + " INTEGER,"
                 + KEY_NAME + " TEXT,"
-                + KEY_POSTER+ " TEXT,"
-                + KEY_UPDATE+ " TEXT,"
-                + KEY_CHANNELID + " TEXT);";
+                + KEY_POSTER + " TEXT,"
+                + KEY_UPDATE + " TEXT,"
+                + KEY_CHANNELID + " TEXT,"
+                + KEY_TIME_STAMP + " DATETIME DEFAULT CURRENT_TIMESTAMP);";
+
 
         sqLiteDatabase.execSQL(CREATE_FAVORITES_TABLE);
 
         String CREATE_RECENT_TABLE = "CREATE TABLE " + TABLE_RECENT + " ("
                 + KEY_HASHCODE + " INTEGER,"
                 + KEY_NAME + " TEXT,"
-                + KEY_POSTER+ " TEXT,"
-                + KEY_UPDATE+ " TEXT,"
+                + KEY_POSTER + " TEXT,"
+                + KEY_UPDATE + " TEXT,"
                 + KEY_CHANNELID + " TEXT,"
                 + KEY_SOURCE + " TEXT,"
                 + KEY_EPISODE + " INTEGER,"
                 + KEY_DURATION_IN_SEC + " INTEGER,"
-                + KEY_CURRENT_POSITION_IN_SEC + " INTEGER);";
+                + KEY_CURRENT_POSITION_IN_SEC + " INTEGER,"
+                + KEY_TIME_STAMP + " DATETIME DEFAULT CURRENT_TIMESTAMP);";
 
         sqLiteDatabase.execSQL(CREATE_RECENT_TABLE);
     }
@@ -102,9 +106,9 @@ public class DatabaseHandler extends SQLiteOpenHelper{
     public ProgramSimple getFavorite(int hashCode, String name) {
         SQLiteDatabase db = this.getReadableDatabase();
 
-        Cursor cursor = db.query(TABLE_FAVORITES, new String[] {
-                KEY_HASHCODE,KEY_NAME,KEY_POSTER,KEY_UPDATE,KEY_CHANNELID }, KEY_HASHCODE + "=? and " + KEY_NAME + "=? ",
-                new String[] { String.valueOf(hashCode), name}, null, null, null, null);
+        Cursor cursor = db.query(TABLE_FAVORITES, new String[]{
+                KEY_HASHCODE, KEY_NAME, KEY_POSTER, KEY_UPDATE, KEY_CHANNELID}, KEY_HASHCODE + "=? and " + KEY_NAME + "=? ",
+                new String[]{String.valueOf(hashCode), name}, null, null, null, null);
         if (cursor != null && cursor.getCount() > 0) {
             cursor.moveToFirst();
 
@@ -128,7 +132,7 @@ public class DatabaseHandler extends SQLiteOpenHelper{
     public List<ProgramSimple> getAllFavorites() {
         List<ProgramSimple> psList = new ArrayList<ProgramSimple>();
         // Select All Query
-        String selectQuery = "SELECT  * FROM " + TABLE_FAVORITES;
+        String selectQuery = "SELECT  * FROM " + TABLE_FAVORITES + " ORDER BY " + KEY_TIME_STAMP + " DESC";
 
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
@@ -160,21 +164,21 @@ public class DatabaseHandler extends SQLiteOpenHelper{
         // updating row
         return db.update(TABLE_FAVORITES, values, KEY_CHANNELID + " = ? and "
                 + KEY_HASHCODE + " = ? and " + KEY_NAME + " = ?",
-                new String[] { ps.getChannelId(), String.valueOf(ps.getHashCode()),ps.getName() });
+                new String[]{ps.getChannelId(), String.valueOf(ps.getHashCode()), ps.getName()});
     }
 
     // Deleting single Favorite
     public void deleteFavorite(ProgramSimple programSimple) {
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete(TABLE_FAVORITES, KEY_HASHCODE + " = ? and " + KEY_NAME + " = ? ",
-                new String[] { String.valueOf(programSimple.getHashCode()), programSimple.getName() });
+                new String[]{String.valueOf(programSimple.getHashCode()), programSimple.getName()});
         db.close();
     }
 
     // Deleting all
     public void deleteAllFavorites() {
         SQLiteDatabase db = this.getWritableDatabase();
-        db.delete(TABLE_FAVORITES, null,null);
+        db.delete(TABLE_FAVORITES, null, null);
         db.close();
     }
 
@@ -203,9 +207,9 @@ public class DatabaseHandler extends SQLiteOpenHelper{
         values.put(KEY_UPDATE, item.getUpdateStatus());
         values.put(KEY_CHANNELID, item.getChannelId());
         values.put(KEY_SOURCE, item.getSource());
-        values.put(KEY_EPISODE,item.getEpisode());
-        values.put(KEY_DURATION_IN_SEC,item.getDurationInSec());
-        values.put(KEY_CURRENT_POSITION_IN_SEC,item.getCurrentPositionInSec());
+        values.put(KEY_EPISODE, item.getEpisode());
+        values.put(KEY_DURATION_IN_SEC, item.getDurationInSec());
+        values.put(KEY_CURRENT_POSITION_IN_SEC, item.getCurrentPositionInSec());
 
         // Inserting Row
         db.insert(TABLE_RECENT, null, values);
@@ -216,10 +220,10 @@ public class DatabaseHandler extends SQLiteOpenHelper{
     public Recent getRecent(int hashCode, String name) {
         SQLiteDatabase db = this.getReadableDatabase();
 
-        Cursor cursor = db.query(TABLE_RECENT, new String[] {
-                KEY_HASHCODE,KEY_NAME,KEY_POSTER,KEY_UPDATE,KEY_CHANNELID,KEY_SOURCE,KEY_EPISODE,KEY_DURATION_IN_SEC,KEY_CURRENT_POSITION_IN_SEC }
+        Cursor cursor = db.query(TABLE_RECENT, new String[]{
+                KEY_HASHCODE, KEY_NAME, KEY_POSTER, KEY_UPDATE, KEY_CHANNELID, KEY_SOURCE, KEY_EPISODE, KEY_DURATION_IN_SEC, KEY_CURRENT_POSITION_IN_SEC}
                 , KEY_HASHCODE + "=? and " + KEY_NAME + "=? "
-                , new String[] { String.valueOf(hashCode), name}, null, null, null, null);
+                , new String[]{String.valueOf(hashCode), name}, null, null, null, null);
         if (cursor != null && cursor.getCount() > 0) {
             cursor.moveToFirst();
 
@@ -248,7 +252,7 @@ public class DatabaseHandler extends SQLiteOpenHelper{
 //        List<Recent> itemList = new ArrayList<Recent>();
         List<ProgramSimple> itemList = new ArrayList<ProgramSimple>();
         // Select All Query
-        String selectQuery = "SELECT  * FROM " + TABLE_RECENT;
+        String selectQuery = "SELECT  * FROM " + TABLE_RECENT + " ORDER BY " + KEY_TIME_STAMP + " DESC";
 
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
@@ -282,28 +286,28 @@ public class DatabaseHandler extends SQLiteOpenHelper{
         values.put(KEY_POSTER, item.getPoster());
         values.put(KEY_UPDATE, item.getUpdateStatus());
         values.put(KEY_SOURCE, item.getSource());
-        values.put(KEY_EPISODE,item.getEpisode());
-        values.put(KEY_DURATION_IN_SEC,item.getDurationInSec());
-        values.put(KEY_CURRENT_POSITION_IN_SEC,item.getCurrentPositionInSec());
+        values.put(KEY_EPISODE, item.getEpisode());
+        values.put(KEY_DURATION_IN_SEC, item.getDurationInSec());
+        values.put(KEY_CURRENT_POSITION_IN_SEC, item.getCurrentPositionInSec());
 
         // updating row
         return db.update(TABLE_RECENT, values, KEY_CHANNELID + " = ? and "
                 + KEY_HASHCODE + " = ? and " + KEY_NAME + " = ?",
-                new String[] { item.getChannelId(), String.valueOf(item.getHashCode()),item.getName() });
+                new String[]{item.getChannelId(), String.valueOf(item.getHashCode()), item.getName()});
     }
 
     // Deleting single item
     public void deleteRecent(Recent item) {
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete(TABLE_RECENT, KEY_HASHCODE + " = ? and " + KEY_NAME + " = ? ",
-                new String[] { String.valueOf(item.getHashCode()), item.getName() });
+                new String[]{String.valueOf(item.getHashCode()), item.getName()});
         db.close();
     }
 
     // Deleting all
     public void deleteAllRecent() {
         SQLiteDatabase db = this.getWritableDatabase();
-        db.delete(TABLE_RECENT, null,null);
+        db.delete(TABLE_RECENT, null, null);
         db.close();
     }
 
