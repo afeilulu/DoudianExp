@@ -4,10 +4,6 @@ package cn.com.xinli.android.doudian.ui.tv;
  * Created by chen on 2/21/14.
  */
 
-import android.animation.Animator;
-import android.animation.FloatEvaluator;
-import android.animation.IntEvaluator;
-import android.animation.ValueAnimator;
 import android.annotation.TargetApi;
 import android.app.AlertDialog;
 import android.content.Intent;
@@ -35,8 +31,6 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
-import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.google.gson.Gson;
@@ -116,14 +110,6 @@ public class PlayerActivity extends BaseActivity implements
             mTopPanelHider.hide();
         }
     };
-    View.OnFocusChangeListener OnMenuFocusChangeListener = new View.OnFocusChangeListener() {
-        @Override
-        public void onFocusChange(View view, boolean b) {
-            if (b) {
-                subMenuToggle(view);
-            }
-        }
-    };
     private boolean hasActiveHolder;
     private int width = 0;
     private int height = 0;
@@ -143,8 +129,15 @@ public class PlayerActivity extends BaseActivity implements
     private TextView mTextEpisodeIndex = null;
     private View lastView = null;
     private TextView mProgresssTextView = null;
-    private int lastHeight;
-    private int initFocusCount;
+    private boolean mAnimationStartFromNow = false;
+    View.OnFocusChangeListener OnMenuFocusChangeListener = new View.OnFocusChangeListener() {
+        @Override
+        public void onFocusChange(View view, boolean b) {
+            if (b && mAnimationStartFromNow) {
+                subMenuToggle2(view);
+            }
+        }
+    };
     private long lastActionTime = 0L;
     private TappableSurfaceView.TapListener onTap =
             new TappableSurfaceView.TapListener() {
@@ -166,7 +159,6 @@ public class PlayerActivity extends BaseActivity implements
     private boolean isPaused = false;
     private TransparentThumbSeekBar timeline = null;
     private ImageView media = null;
-    private int mShortAnimTime;
     /**
      * The instance of the {@link cn.com.xinli.android.doudian.utils.ControlHider} for this activity.
      */
@@ -192,6 +184,7 @@ public class PlayerActivity extends BaseActivity implements
             // 快进
             if (mForwardFlag) {
                 SeekTo(timeline.getProgress() * 1000);
+                mForwardFlag = false;
                 return;
             }
 
@@ -339,23 +332,6 @@ public class PlayerActivity extends BaseActivity implements
         bottomPanel = findViewById(R.id.bottom_panel);
 
         timeline = (TransparentThumbSeekBar) findViewById(R.id.timeline);
-        timeline.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-//                mProgresssTextView.setProgress(i);
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-
-            }
-        });
-
 
         media = (ImageView) findViewById(R.id.media);
 
@@ -363,19 +339,6 @@ public class PlayerActivity extends BaseActivity implements
         qualityPanel = findViewById(R.id.qualityPanel);
         episodePanel = findViewById(R.id.episodePanel);
         sourcePanel = findViewById(R.id.sourcePanel);
-
-        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) sizeSelectorPanel.getLayoutParams();
-        params.height = 0;
-        sizeSelectorPanel.setLayoutParams(params);
-        params = (RelativeLayout.LayoutParams) qualityPanel.getLayoutParams();
-        params.height = 0;
-        qualityPanel.setLayoutParams(params);
-        params = (RelativeLayout.LayoutParams) episodePanel.getLayoutParams();
-        params.height = 0;
-        episodePanel.setLayoutParams(params);
-        params = (RelativeLayout.LayoutParams) sourcePanel.getLayoutParams();
-        params.height = 0;
-        sourcePanel.setLayoutParams(params);
 
         sizeSelectorButton = (Button) findViewById(R.id.sizeSelectorButton);
         qualityButton = (Button) findViewById(R.id.qualityButton);
@@ -392,7 +355,6 @@ public class PlayerActivity extends BaseActivity implements
         episodeButton.setOnClickListener(onMenu);
         sourceButton.setOnClickListener(onMenu);
 
-//        episodeButton.setOnKeyListener(onEpisodeUpAndDown);
         mTextEpisodeIndex = (TextView) findViewById(R.id.episodeIndex);
 
         ((TextView) findViewById(R.id.name)).setText(mProgramSimple.getName());
@@ -409,64 +371,18 @@ public class PlayerActivity extends BaseActivity implements
         mTopPanelHider
                 .setOnVisibilityChangeListener(new ControlHider.OnVisibilityChangeListener() {
                     // Cached values.
-                    int mTopPanelHeight;
-                    int mBottomPanelHeight;
 
                     @Override
                     @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
                     public void onVisibilityChange(final boolean visible) {
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
-                            // If the ViewPropertyAnimator API is available
-                            // (Honeycomb MR2 and later), use it to animate the
-                            // in-layout UI controls at the bottom of the
-                            // screen.
-                            if (mTopPanelHeight == 0) {
-                                mTopPanelHeight = topPanel.getHeight();
-                            }
-                            if (mBottomPanelHeight == 0) {
-                                mBottomPanelHeight = bottomPanel.getHeight();
-                            }
-                            if (mShortAnimTime == 0) {
-                                mShortAnimTime = getResources().getInteger(
-                                        android.R.integer.config_shortAnimTime);
-                            }
-                            topPanel.animate()
-                                    .translationY(visible ? 0 : -mTopPanelHeight)
-                                    .setDuration(mShortAnimTime)
-                                    .setListener(new Animator.AnimatorListener() {
-                                        @Override
-                                        public void onAnimationStart(Animator animator) {
-
-                                        }
-
-                                        @Override
-                                        public void onAnimationEnd(Animator animator) {
-                                            initFocusCount++;
-                                            subMenuToggle(getCurrentFocus());
-                                        }
-
-                                        @Override
-                                        public void onAnimationCancel(Animator animator) {
-
-                                        }
-
-                                        @Override
-                                        public void onAnimationRepeat(Animator animator) {
-
-                                        }
-                                    });
-
+                        topPanel.setAlpha(visible ? 0.7f : 0f);
+                        View focusedMenu = findViewById(mMenuId);
+                        if (focusedMenu != null){
+                            focusedMenu.requestFocus();
+                            subMenuToggle2(focusedMenu);
                         } else {
-                            // If the ViewPropertyAnimator APIs aren't
-                            // available, simply show or hide the in-layout UI
-                            // controls.
-                            topPanel.setVisibility(visible ? View.VISIBLE : View.GONE);
+                            subMenuToggle2(getCurrentFocus());
                         }
-
-//                        if (visible && AUTO_HIDE) {
-//                            // Schedule a hide().
-//                            delayedHide(AUTO_HIDE_DELAY_MILLIS);
-//                        }
                     }
                 });
 
@@ -490,7 +406,7 @@ public class PlayerActivity extends BaseActivity implements
     protected void onResume() {
         super.onResume();
 
-        initFocusCount = 0;
+        mAnimationStartFromNow = false;
         isPaused = false;
         surface.postDelayed(onEverySecond, 1000);
 
@@ -500,14 +416,9 @@ public class PlayerActivity extends BaseActivity implements
     @Override
     protected void onPause() {
         super.onPause();
-
         isPaused = true;
-
         lastView = null;
-        lastHeight = 0;
-
         addToRecent();
-
         onDestroy();
     }
 
@@ -779,143 +690,10 @@ public class PlayerActivity extends BaseActivity implements
             }
         }
 
-        if (mTopPanelHider.isVisible()) {
-
-            ValueAnimator anim = ValueAnimator.ofObject(new HeightEvaluator(lastView), lastHeight, 0);
-            anim.addListener(new Animator.AnimatorListener() {
-                @Override
-                public void onAnimationStart(Animator animator) {
-
-                }
-
-                @Override
-                public void onAnimationEnd(Animator animator) {
-                    if (TOGGLE_ON_CLICK) {
-                        mTopPanelHider.toggle();
-                    } else {
-                        mTopPanelHider.show();
-                    }
-
-                    View view = findViewById(mMenuId);
-                    if (view != null)
-                        view.requestFocus();
-                }
-
-                @Override
-                public void onAnimationCancel(Animator animator) {
-
-                }
-
-                @Override
-                public void onAnimationRepeat(Animator animator) {
-
-                }
-            });
-            anim.start();
-
-            lastView = null;
-            lastHeight = 0;
+        if (TOGGLE_ON_CLICK) {
+            mTopPanelHider.toggle();
         } else {
-            if (TOGGLE_ON_CLICK) {
-                mTopPanelHider.toggle();
-            } else {
-                mTopPanelHider.show();
-            }
-        }
-    }
-
-    private Runnable onEverySecond = new Runnable() {
-        public void run() {
-
-            // disappear after reset 3 seconds
-            if (System.currentTimeMillis() - mForwardActionStartTime > mForwardWaitingTime + 3000) {
-                bottomPanel.setVisibility(View.INVISIBLE);
-                mProgresssTextView.setVisibility(View.INVISIBLE);
-            }
-
-            // 设回正在播放的位置
-            if (mForwardFlag && System.currentTimeMillis() - mForwardActionStartTime > mForwardWaitingTime) {
-                mForwardFlag = false;
-                if (mIsM3u8) {
-                    timeline.setProgress(m3u8LastSeekPosition + player.getCurrentPosition() / 1000);
-                } else {
-                    timeline.setProgress(player.getCurrentPosition() / 1000);
-                }
-                mProgresssTextView.setX(timeline.getSeekBarThumb().getBounds().centerX() + 25);
-            }
-
-            if (player != null && !mForwardFlag) {
-                if (mIsM3u8) {
-                    timeline.setProgress(m3u8LastSeekPosition + player.getCurrentPosition() / 1000);
-                } else {
-                    timeline.setProgress(player.getCurrentPosition() / 1000);
-                }
-                mProgresssTextView.setText(seconds2TimeString(timeline.getProgress()));
-            }
-
-            if (!isPaused) {
-                surface.postDelayed(onEverySecond, 1000);
-            }
-        }
-    };
-
-    private void subMenuToggle(View view) {
-        if (view == null) return;
-
-        if (mTopPanelHider.isVisible()) {
-            mMenuId = view.getId();
-            switch (view.getId()) {
-                case R.id.sizeSelectorButton:
-                    if (lastView != sizeSelectorPanel) {
-                        sizeSelectorPanel.getBackground().setAlpha(alphaValue);
-                        ValueAnimator.ofObject(new HeightEvaluator(lastView), lastHeight, 0).start();
-//                        ValueAnimator.ofObject(new AlphaEvaluator(lastView), 0.7, 0).start();
-                        ValueAnimator.ofObject(new HeightEvaluator(sizeSelectorPanel), 0, 2 * mButtonFixedHeight).start();
-//                        ValueAnimator.ofObject(new AlphaEvaluator(sizeSelectorPanel), 0, 0.7).start();
-                        lastView = sizeSelectorPanel;
-                        lastHeight = 2 * mButtonFixedHeight;
-                    }
-                    break;
-                case R.id.qualityButton:
-                    if (lastView != qualityPanel) {
-                        qualityPanel.getBackground().setAlpha(alphaValue);
-                        ValueAnimator.ofObject(new HeightEvaluator(lastView), lastHeight, 0).start();
-//                        ValueAnimator.ofObject(new AlphaEvaluator(lastView), 0.7, 0).start();
-                        ValueAnimator.ofObject(new HeightEvaluator(qualityPanel), 0, mQualityPanelHeight).start();
-//                        ValueAnimator.ofObject(new AlphaEvaluator(qualityPanel), 0, 0.7).start();
-                        lastView = qualityPanel;
-                        lastHeight = mQualityPanelHeight;
-
-                    }
-                    break;
-                case R.id.episodeButton:
-                    if (lastView != episodePanel) {
-                        episodePanel.getBackground().setAlpha(alphaValue);
-                        ValueAnimator.ofObject(new HeightEvaluator(lastView), lastHeight, 0).start();
-//                        ValueAnimator.ofObject(new AlphaEvaluator(lastView), 0.7, 0).start();
-                        ValueAnimator.ofObject(new HeightEvaluator(episodePanel), 0, 110).start();
-//                        ValueAnimator.ofObject(new AlphaEvaluator(episodePanel), 0, 0.7).start();
-                        lastView = episodePanel;
-                        lastHeight = 110;
-                        mTextEpisodeIndex.setText(String.valueOf(mEpisodeIndex + 1));
-
-                    }
-                    break;
-                case R.id.sourceButton:
-                    if (lastView != sourcePanel && initFocusCount > 0) {
-                        sourcePanel.getBackground().setAlpha(alphaValue);
-                        ValueAnimator.ofObject(new HeightEvaluator(lastView), lastHeight, 0).start();
-//                        ValueAnimator.ofObject(new AlphaEvaluator(lastView), 0.7, 0).start();
-                        ValueAnimator.ofObject(new HeightEvaluator(sourcePanel), 0, mSourcePanelHeight).start();
-//                        ValueAnimator.ofObject(new AlphaEvaluator(sourcePanel), 0, 0.7).start();
-                        lastView = sourcePanel;
-                        lastHeight = mSourcePanelHeight;
-
-                    }
-                    break;
-                default:
-                    break;
-            }
+            mTopPanelHider.show();
         }
     }
 
@@ -1013,6 +791,42 @@ public class PlayerActivity extends BaseActivity implements
         });
     }
 
+    private Runnable onEverySecond = new Runnable() {
+        public void run() {
+
+            // disappear after reset 3 seconds
+            if (System.currentTimeMillis() - mForwardActionStartTime > mForwardWaitingTime + 3000) {
+                bottomPanel.setVisibility(View.INVISIBLE);
+                mProgresssTextView.setVisibility(View.INVISIBLE);
+            }
+
+            // 设回正在播放的位置
+            if (mForwardFlag && System.currentTimeMillis() - mForwardActionStartTime > mForwardWaitingTime) {
+                mForwardFlag = false;
+                if (mIsM3u8) {
+                    timeline.setProgress(m3u8LastSeekPosition + player.getCurrentPosition() / 1000);
+                } else {
+                    timeline.setProgress(player.getCurrentPosition() / 1000);
+                }
+//                mProgresssTextView.setX(timeline.getSeekBarThumb().getBounds().centerX() + 25);
+                mProgresssTextView.animate().translationX(timeline.getSeekBarThumb().getBounds().centerX() + 25);
+            }
+
+            if (player != null && !mForwardFlag) {
+                if (mIsM3u8) {
+                    timeline.setProgress(m3u8LastSeekPosition + player.getCurrentPosition() / 1000);
+                } else {
+                    timeline.setProgress(player.getCurrentPosition() / 1000);
+                }
+                mProgresssTextView.setText(seconds2TimeString(timeline.getProgress()));
+            }
+
+            if (!isPaused) {
+                surface.postDelayed(onEverySecond, 1000);
+            }
+        }
+    };
+
     private String uriPrehandle(String uri) {
         if (uri.endsWith("m3u8")) {
             mIsM3u8 = true;
@@ -1065,8 +879,6 @@ public class PlayerActivity extends BaseActivity implements
             View view = ((ViewGroup) sourcePanel).getChildAt(((ViewGroup) sourcePanel).getChildCount() - 1);
             view.setNextFocusDownId(view.getId());
         }
-
-//        sourcePanel.invalidate();
 
     }
 
@@ -1253,7 +1065,6 @@ public class PlayerActivity extends BaseActivity implements
             button.setCompoundDrawablesWithIntrinsicBounds(R.drawable.site_tudou, 0, 0, 0);
 
         button.setPadding(10, 10, 10, 10);
-        button.setAlpha(0.7f);
         button.setId(idStart++);
 
         ((ViewGroup) sourcePanel).addView(button);
@@ -1297,7 +1108,8 @@ public class PlayerActivity extends BaseActivity implements
 
         timeline.setProgress(position);
         mProgresssTextView.setText(seconds2TimeString(position));
-        mProgresssTextView.setX(timeline.getSeekBarThumb().getBounds().centerX() + 25);
+//        mProgresssTextView.setX(timeline.getSeekBarThumb().getBounds().centerX() + 25);
+        mProgresssTextView.animate().translationX(timeline.getSeekBarThumb().getBounds().centerX() + 25);
     }
 
     private void SeekTo(int milliSeconds) {
@@ -1331,43 +1143,88 @@ public class PlayerActivity extends BaseActivity implements
 
     }
 
-    private class HeightEvaluator extends IntEvaluator {
+    private void subMenuToggle2(View view) {
+        if (view == null) return;
 
-        private View v;
-
-        public HeightEvaluator(View v) {
-            this.v = v;
+        if (lastView == null) {
+            mAnimationStartFromNow = true;
+            lastView = sizeSelectorPanel;
+            return;
         }
 
-        @Override
-        public Integer evaluate(float fraction, Integer startValue, Integer endValue) {
-            int num = super.evaluate(fraction, startValue, endValue);
-            Log.d(TAG, "fraction=" + fraction);
-            if (v == null)
-                return 0;
-            ViewGroup.LayoutParams params = v.getLayoutParams();
-            params.height = num;
-            v.setLayoutParams(params);
-            return num;
-        }
-    }
-
-    private class AlphaEvaluator extends FloatEvaluator {
-
-        private View v;
-
-        public AlphaEvaluator(View v) {
-            this.v = v;
-        }
-
-        @Override
-        public Float evaluate(float fraction, Number startValue, Number endValue) {
-            Float num = super.evaluate(fraction, startValue, endValue);
-            if (v == null)
-                return 0f;
-
-            v.setAlpha(num);
-            return num;
+        mMenuId = view.getId();
+        switch (view.getId()) {
+            case R.id.sizeSelectorButton:
+                if (lastView != sizeSelectorPanel) {
+                    lastView.setAlpha(0f);
+                    lastView.setVisibility(View.GONE);
+                    sizeSelectorPanel.setVisibility(View.VISIBLE);
+                    sizeSelectorPanel.animate().alpha(0.7f);
+                    lastView = sizeSelectorPanel;
+                } else {
+                    if (mTopPanelHider.isVisible()) {
+                        lastView.setVisibility(View.VISIBLE);
+                        lastView.animate().alpha(0.7f);
+                    } else {
+                        lastView.setAlpha(0f);
+                        lastView.setVisibility(View.GONE);
+                    }
+                }
+                break;
+            case R.id.qualityButton:
+                if (lastView != qualityPanel) {
+                    lastView.setAlpha(0f);
+                    lastView.setVisibility(View.GONE);
+                    qualityPanel.setVisibility(View.VISIBLE);
+                    qualityPanel.animate().alpha(0.7f);
+                    lastView = qualityPanel;
+                } else {
+                    if (mTopPanelHider.isVisible()) {
+                        lastView.setVisibility(View.VISIBLE);
+                        lastView.animate().alpha(0.7f);
+                    } else {
+                        lastView.setAlpha(0f);
+                        lastView.setVisibility(View.GONE);
+                    }
+                }
+                break;
+            case R.id.episodeButton:
+                if (lastView != episodePanel) {
+                    lastView.setAlpha(0f);
+                    lastView.setVisibility(View.GONE);
+                    episodePanel.setVisibility(View.VISIBLE);
+                    episodePanel.animate().alpha(0.7f);
+                    lastView = episodePanel;
+                    mTextEpisodeIndex.setText(String.valueOf(mEpisodeIndex + 1));
+                } else {
+                    if (mTopPanelHider.isVisible()) {
+                        lastView.setVisibility(View.VISIBLE);
+                        lastView.animate().alpha(0.7f);
+                    } else {
+                        lastView.setAlpha(0f);
+                        lastView.setVisibility(View.GONE);
+                    }
+                }
+                break;
+            case R.id.sourceButton:
+                if (lastView != sourcePanel) {
+                    lastView.setAlpha(0f);
+                    lastView.setVisibility(View.GONE);
+                    sourcePanel.setVisibility(View.VISIBLE);
+                    sourcePanel.animate().alpha(0.7f);
+                    lastView = sourcePanel;
+                } else {
+                    if (mTopPanelHider.isVisible()) {
+                        lastView.setVisibility(View.VISIBLE);
+                        lastView.animate().alpha(0.7f);
+                    } else {
+                        lastView.setAlpha(0f);
+                        lastView.setVisibility(View.GONE);
+                    }
+                }
+                break;
+            default:
+                break;
         }
     }
 
