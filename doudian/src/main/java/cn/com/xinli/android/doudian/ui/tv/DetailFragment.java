@@ -486,6 +486,38 @@ public class DetailFragment extends Fragment implements
 
         if (list != null && list.size() > 0) {
 
+            if (mEpisodeMap.get(key.getSourceAlias()) == null) {
+                mEpisodeMap.put(key.getSourceAlias(), list);
+            } else {
+                Collection<Episode> episodesList = mEpisodeMap.get(key.getSourceAlias());
+                for (Episode episode : list) {
+                    episodesList.add(episode);
+                }
+                mEpisodeMap.put(key.getSourceAlias(), episodesList);
+            }
+
+            Collection<Episode> episodesList = mEpisodeMap.get(key.getSourceAlias());
+            int modLeft = episodesList.size() % 20;
+//            int episodePageIndex = episodesList.size() / 20 + 1;
+            int episodePageIndex = key.getPageIndex() + 1;
+
+            // 分集信息没有全部获取
+            // 获取分集信息
+            Intent intent = new Intent(Intent.ACTION_SYNC, null, getActivity(),
+                    GetProgramEpisodesByPage.class);
+            intent.putExtra(Intent.EXTRA_TEXT, GetProgramEpisodesByPage.class.getSimpleName());
+            Method method = new Method();
+            method.setName(DoudianService.GET_PROGRAM_EPISODES_BY_PAGE);
+            method.setChannelID(mProgramSimple.getChannelId());
+            method.setHashCode(mProgramSimple.getHashCode());
+            method.setSourceAlias(key.getSourceAlias());
+            method.setPageIndex(episodePageIndex);
+            intent.putExtra(Intent.EXTRA_UID, new Gson().toJson(method));
+            intent.putExtra(SyncService.EXTRA_STATUS_RECEIVER, mReceiver);
+            getActivity().startService(intent);
+
+        } else {
+
             btnPlay.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -520,38 +552,6 @@ public class DetailFragment extends Fragment implements
 
                 }
             });
-
-            if (mEpisodeMap.get(key.getSourceAlias()) == null) {
-                mEpisodeMap.put(key.getSourceAlias(), list);
-            } else {
-                Collection<Episode> episodesList = mEpisodeMap.get(key.getSourceAlias());
-                for (Episode episode : list) {
-                    episodesList.add(episode);
-                }
-                mEpisodeMap.put(key.getSourceAlias(), episodesList);
-            }
-
-            Collection<Episode> episodesList = mEpisodeMap.get(key.getSourceAlias());
-            int modLeft = episodesList.size() % 20;
-//            int episodePageIndex = episodesList.size() / 20 + 1;
-            int episodePageIndex = key.getPageIndex() + 1;
-
-            // 分集信息没有全部获取
-            // 获取分集信息
-            Intent intent = new Intent(Intent.ACTION_SYNC, null, getActivity(),
-                    GetProgramEpisodesByPage.class);
-            intent.putExtra(Intent.EXTRA_TEXT, GetProgramEpisodesByPage.class.getSimpleName());
-            Method method = new Method();
-            method.setName(DoudianService.GET_PROGRAM_EPISODES_BY_PAGE);
-            method.setChannelID(mProgramSimple.getChannelId());
-            method.setHashCode(mProgramSimple.getHashCode());
-            method.setSourceAlias(key.getSourceAlias());
-            method.setPageIndex(episodePageIndex);
-            intent.putExtra(Intent.EXTRA_UID, new Gson().toJson(method));
-            intent.putExtra(SyncService.EXTRA_STATUS_RECEIVER, mReceiver);
-            getActivity().startService(intent);
-
-        } else {
 
             mTextViewEpisodeIndex.setOnKeyListener(new OnKeyListener() {
                 @Override
@@ -673,7 +673,7 @@ public class DetailFragment extends Fragment implements
     }
 
     private void startPlay() {
-        mPosition = Integer.parseInt(mTextViewEpisodeIndex.getText().toString());
+        mPosition = Integer.parseInt(mTextViewEpisodeIndex.getText().toString()) - 1;
         Intent play = new Intent();
         play.setClass(getActivity(), PlayerActivity.class);
         play.putExtra(Intent.EXTRA_UID, new Gson().toJson(mProgramSimple));

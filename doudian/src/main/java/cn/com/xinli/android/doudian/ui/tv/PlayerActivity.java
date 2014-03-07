@@ -168,73 +168,14 @@ public class PlayerActivity extends BaseActivity implements
     private String mSiteName;
     private String mPlayPage;
     private int mEpisodeIndex;
-    private View.OnClickListener onMenu = new View.OnClickListener() {
-        public void onClick(View v) {
-
-            // 换集
-            if (mTopPanelHider.isVisible() && v.getId() == episodeButton.getId()) {
-                int index = Integer.parseInt(mTextEpisodeIndex.getText().toString());
-                if (index - 1 != mEpisodeIndex) {
-                    mEpisodeIndex = index - 1;
-
-                    timeline.setProgress(0);
-                    mProgresssTextView.setText(seconds2TimeString(0));
-//                  mProgresssTextView.setX(timeline.getSeekBarThumb().getBounds().centerX() + 25);
-                    mProgresssTextView.animate().translationX(timeline.getSeekBarThumb().getBounds().centerX() + 25);
-
-                    detect();
-                    return;
-                }
-            }
-
-            // 快进
-            if (mForwardFlag) {
-                SeekTo(timeline.getProgress() * 1000);
-                mForwardFlag = false;
-                return;
-            }
-
-            playPauseToggle();
-        }
-    };
     private int mEpisodeTotal;
-    private View.OnKeyListener onEpisodeUpAndDown = new View.OnKeyListener() {
-        @Override
-        public boolean onKey(View view, int i, KeyEvent keyEvent) {
-            if (keyEvent.getAction() != keyEvent.ACTION_DOWN)
-                return true;
-
-            mEpisodeTotal = SourceHolder.getInstance().getEpisodeMap().get(mSiteName).size();
-            int index = Integer.parseInt(mTextEpisodeIndex.getText().toString()) - 1;
-            if (i == KeyEvent.KEYCODE_DPAD_UP) {
-                if (index == 0)
-                    index = mEpisodeTotal - 1;
-                else
-                    index--;
-
-                mTextEpisodeIndex.setText(String.valueOf(index + 1));
-                return true;
-            } else if (i == KeyEvent.KEYCODE_DPAD_DOWN) {
-                if (index == mEpisodeTotal - 1)
-                    index = 0;
-                else
-                    index++;
-
-                mTextEpisodeIndex.setText(String.valueOf(index + 1));
-                return true;
-            }
-            return false;
-        }
-    };
     private ProgramSimple mProgramSimple;
     private AsyncHttpClient mHttpc = new AsyncHttpClient();
     private DatabaseHandler databaseHandler;
     private int mMenuId;
     private String[] mDetectResult;
-
     private int mQualityPanelHeight;
     private int mSourcePanelHeight;
-
     private int mHd;// current hd
     private int mSize = -1; // screen size ,0:full size (default),1:keep ratio
     private View.OnClickListener onSizeChange = new View.OnClickListener() {
@@ -256,6 +197,33 @@ public class PlayerActivity extends BaseActivity implements
     private int mDuration;// in seconds
     private boolean mIsM3u8;
     private int mCurrentPosition;
+    private View.OnClickListener onMenu = new View.OnClickListener() {
+        public void onClick(View v) {
+
+            // 换集
+            if (mTopPanelHider.isVisible() && v.getId() == episodeButton.getId()) {
+                int index = Integer.parseInt(mTextEpisodeIndex.getText().toString());
+                if (index - 1 != mEpisodeIndex) {
+                    mEpisodeIndex = index - 1;
+
+                    mCurrentPosition = 0;
+                    setFlagOfProgress(mCurrentPosition);
+
+                    detect();
+                    return;
+                }
+            }
+
+            // 快进
+            if (mForwardFlag) {
+                SeekTo(timeline.getProgress() * 1000);
+                mForwardFlag = false;
+                return;
+            }
+
+            playPauseToggle();
+        }
+    };
     private View.OnClickListener onSourceChange = new View.OnClickListener() {
         public void onClick(View v) {
             if (!v.getTag().toString().equals(mSiteName)) {
@@ -707,8 +675,10 @@ public class PlayerActivity extends BaseActivity implements
     private String getEpisodeWebPageUrl(String sourceAlias, int position) {
         String playUrl = null;
 
-        if (mSourcesList == null || mEpisodeMap == null)
+        if (mSourcesList == null || mEpisodeMap == null) {
+            Log.e(TAG, "source all null-----------------------------------");
             return null;
+        }
 
         Iterator iterator = mSourcesList.iterator();
         while (iterator.hasNext()) {
@@ -748,7 +718,8 @@ public class PlayerActivity extends BaseActivity implements
 
         mPlayPage = getEpisodeWebPageUrl(mSiteName, mEpisodeIndex);
         if (mPlayPage == null) {
-            goBlooey(null);
+            Throwable throwable = new Throwable("play url is null!");
+            goBlooey(throwable);
             return;
         }
 
@@ -770,7 +741,17 @@ public class PlayerActivity extends BaseActivity implements
                             videoInfoParse(mDetectResult);
                             setUpSubMenuQuality();
                         }
-                        playPauseToggle();
+
+                        if (mEpisodeIndex + 1 == Integer.parseInt(mTextEpisodeIndex.getText().toString())) {
+                            // hide ui
+                            playPauseToggle();
+                        } else {
+                            // next episode load successfully
+                            mTextEpisodeIndex.setText(String.valueOf(mEpisodeIndex + 1));
+                            mCurrentPosition = 0;
+                            setFlagOfProgress(mCurrentPosition);
+                        }
+
                         playVideo(uriPrehandle(mDetectResult[1]));
                     } else {
 //                        mStateView.setText("detect finished, but none play file link");
@@ -811,6 +792,21 @@ public class PlayerActivity extends BaseActivity implements
         return uri;
     }
 
+    /**
+     * construct quality sub_menu
+     * It will change only depending on program changed
+     */
+    private void setUpSubMenuQuality() {
+        ((ViewGroup) qualityPanel).removeAllViews();
+        for (Integer i : mHdAll) {
+            addNewSubMenuButtonOfQuality(i);
+        }
+        if (((ViewGroup) qualityPanel).getChildCount() > 0) {
+            View view = ((ViewGroup) qualityPanel).getChildAt(((ViewGroup) qualityPanel).getChildCount() - 1);
+            view.setNextFocusDownId(view.getId());
+        }
+    }
+
     private Runnable onEverySecond = new Runnable() {
         public void run() {
 
@@ -846,21 +842,6 @@ public class PlayerActivity extends BaseActivity implements
             }
         }
     };
-
-    /**
-     * construct quality sub_menu
-     * It will change only depending on program changed
-     */
-    private void setUpSubMenuQuality() {
-        ((ViewGroup) qualityPanel).removeAllViews();
-        for (Integer i : mHdAll) {
-            addNewSubMenuButtonOfQuality(i);
-        }
-        if (((ViewGroup) qualityPanel).getChildCount() > 0) {
-            View view = ((ViewGroup) qualityPanel).getChildAt(((ViewGroup) qualityPanel).getChildCount() - 1);
-            view.setNextFocusDownId(view.getId());
-        }
-    }
 
     /**
      * construct sources sub_menu from source holder
@@ -1092,8 +1073,10 @@ public class PlayerActivity extends BaseActivity implements
 
     private void forwardAction(int keyCode) {
 
-        bottomPanel.setVisibility(View.VISIBLE);
-        mProgresssTextView.setVisibility(View.VISIBLE);
+        if (mProgresssTextView.getVisibility() != View.VISIBLE) {
+            bottomPanel.setVisibility(View.VISIBLE);
+            mProgresssTextView.setVisibility(View.VISIBLE);
+        }
 
         mForwardActionStartTime = System.currentTimeMillis();
         mForwardFlag = true;
@@ -1113,10 +1096,7 @@ public class PlayerActivity extends BaseActivity implements
                 position = mDuration;
         }
 
-        timeline.setProgress(position);
-        mProgresssTextView.setText(seconds2TimeString(position));
-//        mProgresssTextView.setX(timeline.getSeekBarThumb().getBounds().centerX() + 25);
-        mProgresssTextView.animate().translationX(timeline.getSeekBarThumb().getBounds().centerX() + 25);
+        setFlagOfProgress(position);
     }
 
     private void SeekTo(int milliSeconds) {
@@ -1235,7 +1215,12 @@ public class PlayerActivity extends BaseActivity implements
         }
     }
 
-
+    private void setFlagOfProgress(int seconds) {
+        timeline.setProgress(seconds);
+        mProgresssTextView.setText(seconds2TimeString(seconds));
+//                  mProgresssTextView.setX(timeline.getSeekBarThumb().getBounds().centerX() + 25);
+        mProgresssTextView.animate().translationX(timeline.getSeekBarThumb().getBounds().centerX() + 25);
+    }
 
 
 }
