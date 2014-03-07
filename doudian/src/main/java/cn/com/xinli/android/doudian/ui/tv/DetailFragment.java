@@ -60,46 +60,58 @@ import cn.com.xinli.android.doudian.utils.ImageDownloaderLruCache;
 import cn.com.xinli.android.doudian.utils.ImageObjectCache;
 import cn.com.xinli.android.doudian.utils.ImageObjectCache.ImageCacheParams;
 import cn.com.xinli.android.doudian.utils.SourceHolder;
-import cn.com.xinli.android.doudian.utils.StreamProxy;
 import cn.com.xinli.android.doudian.utils.UIUtils;
 
 public class DetailFragment extends Fragment implements
-		DetachableResultReceiver.Receiver {
-	private static final String TAG = "DetailFragment";
-	private int mCountInLine = 7;
-	private DetachableResultReceiver mReceiver;
-	private ImageDownloaderLruCache imageDownloaderLruCache;
-	private ArrayList<String> hostory;
-	private ImageView tvPoster;
-	private TextView tvPresent;
-	private TextView tvTime;
-	private TextView tvDirector;
-	private TextView tvActor;
-	private ImageView tvHD;
-	private TextView tvScore;
-	private RatingBar rbScore;
-	private TextView tvRecount;
-	private HorizontalVariableListView hListView;
-	private TextView tvDetail;
-	private Button btnPlay;
-	private Button btnFavorite;
-	private ImageView focusmask;
-	private int focuswidth;
-	private int focusheight;
-	private Drawable drawPlay;
-	private Drawable drawActor;
-	private Drawable drawFavorite;
-	private Drawable drawFavorited;
-	// 动态变量
-//	ArrayList<DetailActor> alist = new ArrayList<DetailActor>();
-//	ArrayList<DetailSource> dslist = null;
-//	ArrayList<ProgramDetail> rlist = null;
-	int curPy = 0;
-	int curJm = 0;
-	int curIn = 0;
-	int hsize = 1;
-
-//    private String mChannelId;
+        DetachableResultReceiver.Receiver {
+    private static final String TAG = "DetailFragment";
+    int curPy = 0;
+    int curJm = 0;
+    int curIn = 0;
+    int hsize = 1;
+    private int mCountInLine = 7;
+    private DetachableResultReceiver mReceiver;
+    private ImageDownloaderLruCache imageDownloaderLruCache;
+    private ArrayList<String> hostory;
+    private ImageView tvPoster;
+    private TextView tvPresent;
+    private TextView tvTime;
+    private TextView tvDirector;
+    private TextView tvActor;
+    private ImageView tvHD;
+    private TextView tvScore;
+    private RatingBar rbScore;
+    private TextView tvRecount;
+    private HorizontalVariableListView hListView;
+    private TextView tvDetail;
+    private Button btnPlay;
+    private Button btnFavorite;
+    private ImageView focusmask;
+    private TextView mTextViewEpisodeIndex;
+    private String mSiteName = null;
+    private int focuswidth;
+    private int focusheight;
+    private OnKeyListener btnKey = new OnKeyListener() {
+        @Override
+        public boolean onKey(View v, int keyCode, KeyEvent event) {
+            if (keyCode == KeyEvent.KEYCODE_DPAD_DOWN) {
+                int awidth = hListView.getMeasuredWidth();
+                focusheight = 246;
+                focuswidth = (int) (focusheight * 0.618f + 10);
+                FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(
+                        focuswidth, focusheight);
+                lp.setMargins((awidth - focuswidth + 10) / 2, -10, 0, 0);
+                focusmask.setLayoutParams(lp);
+                hListView.centerChildRequestFocus();
+            }
+            return false;
+        }
+    };
+    private Drawable drawPlay;
+    private Drawable drawActor;
+    private Drawable drawFavorite;
+    private Drawable drawFavorited;
+    //    private String mChannelId;
 //    private int mHashCode;
 //    private String mUpdate;
     private DatabaseHandler databaseHandler;
@@ -110,12 +122,12 @@ public class DetailFragment extends Fragment implements
     private String mSourcesFromHttpServer;
     private int mPosition;
 
-	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		mReceiver = new DetachableResultReceiver(new Handler());
-		mReceiver.setReceiver(this);
-		hostory = new ArrayList<String>();
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        mReceiver = new DetachableResultReceiver(new Handler());
+        mReceiver.setReceiver(this);
+        hostory = new ArrayList<String>();
 
         /*Bundle args = getArguments();
         Method method = new Gson().fromJson(args.getString(Intent.EXTRA_UID,null),Method.class);
@@ -124,173 +136,174 @@ public class DetailFragment extends Fragment implements
         mUpdate = args.getString(Intent.EXTRA_TEXT);*/
 
         Bundle args = getArguments();
-        mProgramSimple = new Gson().fromJson(args.getString(Intent.EXTRA_UID,null),ProgramSimple.class);
+        mProgramSimple = new Gson().fromJson(args.getString(Intent.EXTRA_UID, null), ProgramSimple.class);
 
         databaseHandler = new DatabaseHandler(getActivity());
 
-        // get source from http server
-        getSourceFromHttpServer();
-	}
+    }
 
-	@Override
-	public void onActivityCreated(Bundle savedInstanceState) {
-		super.onActivityCreated(savedInstanceState);
-		review(mProgramSimple);
-	}
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        review(mProgramSimple);
+    }
 
-	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-			Bundle savedInstanceState) {
-		View root = inflater.inflate(R.layout.fragment_detail, null);
-		tvPoster = (ImageView) root.findViewById(R.id.tv_poster);
-		tvPresent = (TextView) root.findViewById(R.id.tv_present);
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        View root = inflater.inflate(R.layout.fragment_detail, null);
+        tvPoster = (ImageView) root.findViewById(R.id.tv_poster);
+        tvPresent = (TextView) root.findViewById(R.id.tv_present);
 
-		tvTime = (TextView) root.findViewById(R.id.tv_time);
-		tvDirector = (TextView) root.findViewById(R.id.tv_director);
-		tvActor = (TextView) root.findViewById(R.id.tv_actor);
-		tvHD = (ImageView) root.findViewById(R.id.tv_hd_flag);
-		tvScore = (TextView) root.findViewById(R.id.tv_score);
-		rbScore = (RatingBar) root.findViewById(R.id.star_score);
-		tvRecount = (TextView) root.findViewById(R.id.recount);
-		hListView = (HorizontalVariableListView) root
-				.findViewById(R.id.detail_recommend);
-		tvDetail = (TextView) root.findViewById(R.id.tv_detail);
-		btnPlay = (Button) root.findViewById(R.id.btn_play);
-		btnFavorite = (Button) root.findViewById(R.id.btn_favorite);
-		focusmask = (ImageView) root.findViewById(R.id.focusmask);
+        tvTime = (TextView) root.findViewById(R.id.tv_time);
+        tvDirector = (TextView) root.findViewById(R.id.tv_director);
+        tvActor = (TextView) root.findViewById(R.id.tv_actor);
+        tvHD = (ImageView) root.findViewById(R.id.tv_hd_flag);
+        tvScore = (TextView) root.findViewById(R.id.tv_score);
+        rbScore = (RatingBar) root.findViewById(R.id.star_score);
+        tvRecount = (TextView) root.findViewById(R.id.recount);
+        hListView = (HorizontalVariableListView) root
+                .findViewById(R.id.detail_recommend);
+        tvDetail = (TextView) root.findViewById(R.id.tv_detail);
+        btnPlay = (Button) root.findViewById(R.id.btn_play);
+        btnFavorite = (Button) root.findViewById(R.id.btn_favorite);
+        focusmask = (ImageView) root.findViewById(R.id.focusmask);
 
-		drawPlay = getResources().getDrawable(R.drawable.btn_play);
-		drawActor = getResources().getDrawable(R.drawable.btn_actor);
-		drawFavorite = getResources().getDrawable(R.drawable.btn_favorite);
-		drawFavorited = getResources().getDrawable(R.drawable.btn_favorite_sel);
-		btnPlay.setOnKeyListener(btnKey);
-		btnFavorite.setOnKeyListener(btnKey);
+        drawPlay = getResources().getDrawable(R.drawable.btn_play);
+        drawActor = getResources().getDrawable(R.drawable.btn_actor);
+        drawFavorite = getResources().getDrawable(R.drawable.btn_favorite);
+        drawFavorited = getResources().getDrawable(R.drawable.btn_favorite_sel);
+        btnPlay.setOnKeyListener(btnKey);
+        btnFavorite.setOnKeyListener(btnKey);
         btnFavorite.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
                 ProgramSimple ps = (ProgramSimple) btnFavorite.getTag(R.string.programe_simple_object);
                 Object result = btnFavorite.getTag(R.string.favorite_object);
-                if (result == null){
+                if (result == null) {
                     // addRecent to favorites
                     databaseHandler.addFavorite(ps);
-                    btnFavorite.setTag(R.string.favorite_object,ps);
+                    btnFavorite.setTag(R.string.favorite_object, ps);
                     btnFavorite.setText("已收藏");
 
                     Intent intent = new Intent();
-                    intent.putExtra(Intent.EXTRA_UID,new Gson().toJson(mProgramSimple));
-                    getActivity().setResult(1,intent);
+                    intent.putExtra(Intent.EXTRA_UID, new Gson().toJson(mProgramSimple));
+                    getActivity().setResult(1, intent);
                 } else {
                     // remove from favorites
                     databaseHandler.deleteFavorite(ps);
-                    btnFavorite.setTag(R.string.favorite_object,null);
+                    btnFavorite.setTag(R.string.favorite_object, null);
                     btnFavorite.setText("收藏");
 
                     Intent intent = new Intent();
-                    intent.putExtra(Intent.EXTRA_UID,new Gson().toJson(mProgramSimple));
-                    getActivity().setResult(1,intent);
+                    intent.putExtra(Intent.EXTRA_UID, new Gson().toJson(mProgramSimple));
+                    getActivity().setResult(1, intent);
                 }
             }
         });
-		hListView.setUpAndDownFocus(false, R.id.btn_play, false, 0, true);
-		hListView.setOnItemSelectedListener(new OnItemSelectedListener() {
-			@Override
-			public void onItemSelected(AdapterView<?> parent, View view,
-					int position, long id) {
-				tvRecount.setText((position + 1) + "/" + hsize);
-				focusmask.setVisibility(View.VISIBLE);
-			}
+        hListView.setUpAndDownFocus(false, R.id.btn_play, false, 0, true);
+        hListView.setOnItemSelectedListener(new OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view,
+                                       int position, long id) {
+                tvRecount.setText((position + 1) + "/" + hsize);
+                focusmask.setVisibility(View.VISIBLE);
+            }
 
-			@Override
-			public void onNothingSelected(AdapterView<?> parent) {
-				tvRecount.setText(String.valueOf(hsize));
-				focusmask.setVisibility(View.INVISIBLE);
-			}
-		});
-		btnPlay.setOnFocusChangeListener(new OnFocusChangeListener() {
-			@Override
-			public void onFocusChange(View v, boolean hasFocus) {
-				if (hasFocus) {
-					focusmask.setVisibility(View.INVISIBLE);
-				}
-			}
-		});
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                tvRecount.setText(String.valueOf(hsize));
+                focusmask.setVisibility(View.INVISIBLE);
+            }
+        });
+        btnPlay.setOnFocusChangeListener(new OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (hasFocus) {
+                    focusmask.setVisibility(View.INVISIBLE);
+                }
+            }
+        });
 
-		// imageDownload
-		ImageCacheParams cacheParams = new ImageCacheParams("thumbs");
-		// be care of this value
-		cacheParams.memCacheSize = 1024 * 1024 * UIUtils
-				.getMemoryClass(getActivity()) / 8;
-		cacheParams.memoryCacheEnabled = false;
-		imageDownloaderLruCache = new ImageDownloaderLruCache(getActivity());
-		imageDownloaderLruCache.setImageThumbSize(200);
-		imageDownloaderLruCache.setLoadingImage(R.drawable.item_default_image);
-		imageDownloaderLruCache.setImageObjectCache(ImageObjectCache
-				.findOrCreateCache(getActivity(), cacheParams));
-		return root;
-	}
+        // imageDownload
+        ImageCacheParams cacheParams = new ImageCacheParams("thumbs");
+        // be care of this value
+        cacheParams.memCacheSize = 1024 * 1024 * UIUtils
+                .getMemoryClass(getActivity()) / 8;
+        cacheParams.memoryCacheEnabled = false;
+        imageDownloaderLruCache = new ImageDownloaderLruCache(getActivity());
+        imageDownloaderLruCache.setImageThumbSize(200);
+        imageDownloaderLruCache.setLoadingImage(R.drawable.item_default_image);
+        imageDownloaderLruCache.setImageObjectCache(ImageObjectCache
+                .findOrCreateCache(getActivity(), cacheParams));
 
-	@Override
-	public void onDestroy() {
-		super.onDestroy();
+        mTextViewEpisodeIndex = (TextView) root.findViewById(R.id.episodeIndex);
 
-		BitmapDrawable bitmapDrawable = (BitmapDrawable) tvPoster.getDrawable();
-		Bitmap bitmap = null;
-		if (bitmapDrawable != null) {
-			bitmap = bitmapDrawable.getBitmap();
-			if (bitmap != null)
-				bitmap.recycle();
-		}
+        return root;
+    }
 
-		try {
-			this.finalize();
-		} catch (Throwable e) {
-			e.printStackTrace();
-		}
-	}
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
 
-	@Override
-	public void onReceiveResult(int resultCode, Bundle resultData) {
+        BitmapDrawable bitmapDrawable = (BitmapDrawable) tvPoster.getDrawable();
+        Bitmap bitmap = null;
+        if (bitmapDrawable != null) {
+            bitmap = bitmapDrawable.getBitmap();
+            if (bitmap != null)
+                bitmap.recycle();
+        }
+
+        try {
+            this.finalize();
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void onReceiveResult(int resultCode, Bundle resultData) {
         String actionkey = resultData.getString(Intent.EXTRA_TEXT);
-		switch (resultCode) {
-		case SyncService.STATUS_RUNNING:
-			break;
-		case SyncService.STATUS_FINISHED:
-			if (isVisible() && actionkey != null) {
-				if (actionkey.equals(GetProgramDetail.class.getSimpleName())) {
-                    updateDetail(resultData);
-				} else if (actionkey.equals(GetProgramSources.class
-						.getSimpleName())) {
-					updateSources(resultData);
-                } else if (actionkey.equals(GetProgramEpisodesByPage.class.getSimpleName())){
-                    updateEpisode(resultData);
-				} else if (actionkey.equals(GetProgramRelated.class
-						.getSimpleName())) {
-					updateRelated(resultData);
-				}
-			}
-			break;
-		case SyncService.STATUS_ERROR:
-			if (isAdded()) {
-                if (!actionkey.equals(GetProgramEpisodesByPage.class.getSimpleName()))
-				    showMsg(getString(R.string.network_timeout));
-			}
-			break;
-		default:
-			Log.w(TAG, "warring resultCode=" + resultCode);
-		}
-	}
+        switch (resultCode) {
+            case SyncService.STATUS_RUNNING:
+                break;
+            case SyncService.STATUS_FINISHED:
+                if (isVisible() && actionkey != null) {
+                    if (actionkey.equals(GetProgramDetail.class.getSimpleName())) {
+                        updateDetail(resultData);
+                    } else if (actionkey.equals(GetProgramSources.class
+                            .getSimpleName())) {
+                        updateSources(resultData);
+                    } else if (actionkey.equals(GetProgramEpisodesByPage.class.getSimpleName())) {
+                        updateEpisode(resultData);
+                    } else if (actionkey.equals(GetProgramRelated.class
+                            .getSimpleName())) {
+                        updateRelated(resultData);
+                    }
+                }
+                break;
+            case SyncService.STATUS_ERROR:
+                if (isAdded()) {
+                    if (!actionkey.equals(GetProgramEpisodesByPage.class.getSimpleName()))
+                        showMsg(getString(R.string.network_timeout));
+                }
+                break;
+            default:
+                Log.w(TAG, "warring resultCode=" + resultCode);
+        }
+    }
 
-	/**
-	 * 更新详情页面
-	 * 
-	 * @param bundle
-	 */
-	public void updateDetail(Bundle bundle) {
-        ProgramDetail detail = new Gson().fromJson((String)bundle
-                .getSerializable(GetProgramDetail.class.getSimpleName()),ProgramDetail.class);
-        Method detailMethod = new Gson().fromJson(bundle.getString(Intent.EXTRA_UID),Method.class);
+    /**
+     * 更新详情页面
+     *
+     * @param bundle
+     */
+    public void updateDetail(Bundle bundle) {
+        ProgramDetail detail = new Gson().fromJson((String) bundle
+                .getSerializable(GetProgramDetail.class.getSimpleName()), ProgramDetail.class);
+        Method detailMethod = new Gson().fromJson(bundle.getString(Intent.EXTRA_UID), Method.class);
 
-        if (detail == null){
+        if (detail == null) {
             btnPlay.setEnabled(false);
             btnFavorite.setEnabled(false);
             return;
@@ -304,23 +317,14 @@ public class DetailFragment extends Fragment implements
 //        mProgramSimple.setUpdateStatus();
         mProgramSimple.setChannelId(getNormalChannelId(detail));
 
-        Method method = new Method();
-        // 查询节目源
-        Intent sourceIntent = new Intent(Intent.ACTION_SYNC, null,
-                getActivity(), GetProgramSources.class);
-        sourceIntent.putExtra(Intent.EXTRA_TEXT,GetProgramSources.class.getSimpleName());
-        method.setName(DoudianService.GET_PROGRAM_SOURCES);
-        method.setChannelID(mProgramSimple.getChannelId());
-        method.setHashCode(mProgramSimple.getHashCode());
-        sourceIntent.putExtra(Intent.EXTRA_UID, new Gson().toJson(method));
-        sourceIntent.putExtra(SyncService.EXTRA_STATUS_RECEIVER, mReceiver);
-        getActivity().startService(sourceIntent);
+        // get source from http server
+        getSourceFromHttpServer();
 
         // 查询相关推荐
         Intent relatedIntent = new Intent(Intent.ACTION_SYNC, null,
                 getActivity(), GetProgramRelated.class);
-        relatedIntent.putExtra(Intent.EXTRA_TEXT,GetProgramRelated.class.getSimpleName());
-        method = new Method();
+        relatedIntent.putExtra(Intent.EXTRA_TEXT, GetProgramRelated.class.getSimpleName());
+        Method method = new Method();
         method.setName(DoudianService.GET_PROGRAM_RELATED);
         method.setChannelID(mProgramSimple.getChannelId());
         method.setHashCode(mProgramSimple.getHashCode());
@@ -376,61 +380,87 @@ public class DetailFragment extends Fragment implements
         ps.setName(detail.getName());
         ps.setPoster(detail.getPoster());
         ps.setUpdateStatus(mProgramSimple.getUpdateStatus());
-        btnFavorite.setTag(R.string.programe_simple_object,ps);
+        btnFavorite.setTag(R.string.programe_simple_object, ps);
         btnFavorite.setTag(R.string.favorite_object, result);
-        if (result == null){
+        if (result == null) {
             btnFavorite.setText("收藏");
         } else {
             btnFavorite.setText("已收藏");
         }
 
-	}
+        Recent recent = databaseHandler.getRecent(detail.getHashcode(), detail.getName());
+        if (recent == null)
+            mPosition = 0;
+        else {
+            mSiteName = recent.getSource();
+            mPosition = recent.getEpisode();
+        }
 
-	/**
-	 * 更新节目源
-	 * 
-	 * @param bundle
-	 */
-	@SuppressWarnings("unchecked")
-	public void updateSources(Bundle bundle) {
+        mTextViewEpisodeIndex.setVisibility(View.VISIBLE);
+        mTextViewEpisodeIndex.setText(String.valueOf(mPosition + 1));
+    }
+
+    /**
+     * 更新节目源
+     *
+     * @param bundle
+     */
+    @SuppressWarnings("unchecked")
+    public void updateSources(Bundle bundle) {
         mSourcesList = SourceHolder.getInstance().getSourcesList();
         mEpisodeMap = SourceHolder.getInstance().getEpisodeMap();
 
-        if (mSourcesList != null){
+        if (mSourcesList != null) {
             mSourcesList.clear();
         }
 
-        Type collectionType = new TypeToken<Collection<Source>>(){}.getType();
-         mSourcesList = new Gson().fromJson((String)bundle
+        Type collectionType = new TypeToken<Collection<Source>>() {
+        }.getType();
+        mSourcesList = new Gson().fromJson((String) bundle
                 .getSerializable(GetProgramSources.class.getSimpleName()), collectionType);
 
-		if (mSourcesList != null && mSourcesList.size() > 0) {
+        if (mSourcesList != null && mSourcesList.size() > 0) {
 
-            SourceHolder.getInstance().setSourcesList((ArrayList<Source>) mSourcesList);
+            SourceHolder.getInstance().setSourcesList(mSourcesList);
 
-			btnPlay.setClickable(true);
-			btnPlay.setFocusable(true);
-			btnPlay.setFocusableInTouchMode(true);
-			btnPlay.setCompoundDrawablesWithIntrinsicBounds(drawPlay, null,
-					null, null);
-			if (btnPlay.isFocusableInTouchMode()) {
-				btnPlay.requestFocusFromTouch();
-			} else {
-				btnPlay.requestFocus();
-			}
+            btnPlay.setClickable(true);
+            btnPlay.setFocusable(true);
+            btnPlay.setFocusableInTouchMode(true);
+            btnPlay.setCompoundDrawablesWithIntrinsicBounds(drawPlay, null,
+                    null, null);
+            if (btnPlay.isFocusableInTouchMode()) {
+                btnPlay.requestFocusFromTouch();
+            } else {
+                btnPlay.requestFocus();
+            }
 
-            if (mEpisodeMap == null ){
+            if (mEpisodeMap == null) {
                 mEpisodeMap = new HashMap<String, Collection<Episode>>();
                 SourceHolder.getInstance().setEpisodeMap(mEpisodeMap);
             } else
                 mEpisodeMap.clear();
 
-            for (Source s:mSourcesList){
-                mEpisodeMap.put(s.getAlias(),null);
+
+            // 已得到所有分集信息
+            // 匹配http server返回的源和抓取来的源，以http server返回的源为基准
+            Iterator<Source> sourceIterator = mSourcesList.iterator();
+            while (sourceIterator.hasNext()) {
+                Source source = sourceIterator.next();
+                if (mSourcesFromHttpServer != null && !mSourcesFromHttpServer.contains(source.getAlias())) {
+                    sourceIterator.remove();
+                }
+            }
+
+            if (mSourcesList.size() > 0) {
+                mSiteName = mSourcesList.get(0).getAlias();
+            }
+
+            for (Source s : mSourcesList) {
+                mEpisodeMap.put(s.getAlias(), null);
                 // 获取分集信息
                 Intent intent = new Intent(Intent.ACTION_SYNC, null, getActivity(),
                         GetProgramEpisodesByPage.class);
-                intent.putExtra(Intent.EXTRA_TEXT,GetProgramEpisodesByPage.class.getSimpleName());
+                intent.putExtra(Intent.EXTRA_TEXT, GetProgramEpisodesByPage.class.getSimpleName());
                 Method method = new Method();
                 method.setName(DoudianService.GET_PROGRAM_EPISODES_BY_PAGE);
                 method.setChannelID(mProgramSimple.getChannelId());
@@ -442,19 +472,19 @@ public class DetailFragment extends Fragment implements
                 getActivity().startService(intent);
             }
 
-		}
-	}
+        }
+    }
 
-    private void updateEpisode(Bundle bundle){
+    private void updateEpisode(Bundle bundle) {
 
         mEpisodeMap = SourceHolder.getInstance().getEpisodeMap();
 
-        Method key = new Gson().fromJson(bundle.getString(Intent.EXTRA_UID,null),Method.class);
+        Method key = new Gson().fromJson(bundle.getString(Intent.EXTRA_UID, null), Method.class);
 
         ArrayList<Episode> list = (ArrayList<Episode>) bundle
                 .getSerializable(GetProgramEpisodesByPage.class.getSimpleName());
 
-        if (list != null && list.size() > 0){
+        if (list != null && list.size() > 0) {
 
             btnPlay.setOnClickListener(new OnClickListener() {
                 @Override
@@ -491,71 +521,77 @@ public class DetailFragment extends Fragment implements
                 }
             });
 
-            if (mEpisodeMap.get(key.getSourceAlias()) == null){
-                mEpisodeMap.put(key.getSourceAlias(),list);
+            if (mEpisodeMap.get(key.getSourceAlias()) == null) {
+                mEpisodeMap.put(key.getSourceAlias(), list);
             } else {
                 Collection<Episode> episodesList = mEpisodeMap.get(key.getSourceAlias());
-                for (Episode episode:list){
+                for (Episode episode : list) {
                     episodesList.add(episode);
                 }
-                mEpisodeMap.put(key.getSourceAlias(),episodesList);
+                mEpisodeMap.put(key.getSourceAlias(), episodesList);
             }
 
             Collection<Episode> episodesList = mEpisodeMap.get(key.getSourceAlias());
             int modLeft = episodesList.size() % 20;
-            int episodePageIndex = episodesList.size() / 20 + 1;
-            if (modLeft == 0 ){
-                // 分集信息没有全部获取
-                // 获取分集信息
-                Intent intent = new Intent(Intent.ACTION_SYNC, null, getActivity(),
-                        GetProgramEpisodesByPage.class);
-                intent.putExtra(Intent.EXTRA_TEXT,GetProgramEpisodesByPage.class.getSimpleName());
-                Method method = new Method();
-                method.setName(DoudianService.GET_PROGRAM_EPISODES_BY_PAGE);
-                method.setChannelID(mProgramSimple.getChannelId());
-                method.setHashCode(mProgramSimple.getHashCode());
-                method.setSourceAlias(key.getSourceAlias());
-                method.setPageIndex(episodePageIndex);
-                intent.putExtra(Intent.EXTRA_UID, new Gson().toJson(method));
-                intent.putExtra(SyncService.EXTRA_STATUS_RECEIVER, mReceiver);
-                getActivity().startService(intent);
-            } else {
-                // 已得到所有分集信息
-                // 匹配http server返回的源和抓取来的源，以http server返回的源为基准
-                ArrayList<String> sourceRemoved = new ArrayList<String>();
-                for (Source source:mSourcesList){
-//                    Log.e(TAG, "source from internet : " + source.getAlias());
-                    if (mSourcesFromHttpServer != null && !mSourcesFromHttpServer.contains(source.getAlias())){
-                        mEpisodeMap.remove(source.getAlias());
-                        sourceRemoved.add(source.getAlias());
-                    }
-                }
+//            int episodePageIndex = episodesList.size() / 20 + 1;
+            int episodePageIndex = key.getPageIndex() + 1;
 
-                for (String sourceName:sourceRemoved){
-                    Source sourceNeedRemove = null;
-                    for (Source source:mSourcesList){
-                        if (source.getAlias().equals(sourceName)){
-                            sourceNeedRemove = source;
-                            break;
+            // 分集信息没有全部获取
+            // 获取分集信息
+            Intent intent = new Intent(Intent.ACTION_SYNC, null, getActivity(),
+                    GetProgramEpisodesByPage.class);
+            intent.putExtra(Intent.EXTRA_TEXT, GetProgramEpisodesByPage.class.getSimpleName());
+            Method method = new Method();
+            method.setName(DoudianService.GET_PROGRAM_EPISODES_BY_PAGE);
+            method.setChannelID(mProgramSimple.getChannelId());
+            method.setHashCode(mProgramSimple.getHashCode());
+            method.setSourceAlias(key.getSourceAlias());
+            method.setPageIndex(episodePageIndex);
+            intent.putExtra(Intent.EXTRA_UID, new Gson().toJson(method));
+            intent.putExtra(SyncService.EXTRA_STATUS_RECEIVER, mReceiver);
+            getActivity().startService(intent);
+
+        } else {
+
+            mTextViewEpisodeIndex.setOnKeyListener(new OnKeyListener() {
+                @Override
+                public boolean onKey(View view, int keyCode, KeyEvent keyEvent) {
+                    if (keyEvent.getAction() == KeyEvent.ACTION_DOWN) {
+                        int mEpisodeTotal;
+                        mEpisodeTotal = SourceHolder.getInstance().getEpisodeMap().get(mSiteName).size();
+                        int index = Integer.parseInt(mTextViewEpisodeIndex.getText().toString()) - 1;
+                        if (keyCode == KeyEvent.KEYCODE_DPAD_UP) {
+                            if (index == 0)
+                                index = mEpisodeTotal - 1;
+                            else
+                                index--;
+
+                            mTextViewEpisodeIndex.setText(String.valueOf(index + 1));
+                            return true;
+                        } else if (keyCode == KeyEvent.KEYCODE_DPAD_DOWN) {
+                            if (index == mEpisodeTotal - 1)
+                                index = 0;
+                            else
+                                index++;
+
+                            mTextViewEpisodeIndex.setText(String.valueOf(index + 1));
+                            return true;
                         }
-                    }
-                    if (sourceNeedRemove != null)
-                        mSourcesList.remove(sourceNeedRemove);
-                }
 
-                SourceHolder.getInstance().setSourcesList(mSourcesList);
-                SourceHolder.getInstance().setEpisodeMap(mEpisodeMap);
-            }
+                    }
+                    return false;
+                }
+            });
         }
     }
 
-	/**
-	 * 更新相关推荐
-	 * 
-	 * @param resultData
-	 */
-	@SuppressWarnings("unchecked")
-	public void updateRelated(Bundle resultData) {
+    /**
+     * 更新相关推荐
+     *
+     * @param resultData
+     */
+    @SuppressWarnings("unchecked")
+    public void updateRelated(Bundle resultData) {
 
         Method key = new Gson().fromJson(resultData.getString(Intent.EXTRA_UID, null), Method.class);
 
@@ -578,7 +614,7 @@ public class DetailFragment extends Fragment implements
                     0.618f);
             hListView.setFixPosition(true);
             hListView.setAutoAppendData(false);
-    //            tvRecount.setText(hla.getRecentsCount());
+            //            tvRecount.setText(hla.getRecentsCount());
             hsize = hla.getCount();
 
             hla.setOnItemClickListener(new HorizontalListViewAdapter.OnItemClickListener() {
@@ -590,16 +626,16 @@ public class DetailFragment extends Fragment implements
             });
         }
 
-	}
+    }
 
-	private void review(ProgramSimple programSimple) {
+    private void review(ProgramSimple programSimple) {
 
-		curPy = 0;
-		curJm = 0;
-		curIn = 0;
+        curPy = 0;
+        curJm = 0;
+        curIn = 0;
         tvRecount.setText("");
         btnPlay.setClickable(false);
-        
+
         SourceHolder.getInstance().clear();
 
         ((DetailActivity) getActivity()).setTitle(programSimple.getName());
@@ -607,21 +643,21 @@ public class DetailFragment extends Fragment implements
         imageDownloaderLruCache
                 .download(programSimple.getPoster(), tvPoster, null);
 
-        if (programSimple.getUpdateStatus() !=null && programSimple.getUpdateStatus().endsWith("f")){
-            tvPresent.setText("全 "+ programSimple.getUpdateStatus().substring(0,programSimple.getUpdateStatus().length()-1) + " 集");
+        if (programSimple.getUpdateStatus() != null && programSimple.getUpdateStatus().endsWith("f")) {
+            tvPresent.setText("全 " + programSimple.getUpdateStatus().substring(0, programSimple.getUpdateStatus().length() - 1) + " 集");
             tvPresent.setVisibility(View.VISIBLE);
-        } else if (programSimple.getUpdateStatus() !=null && !programSimple.getUpdateStatus().endsWith("f")){
-            tvPresent.setText("更新至第"+ programSimple.getUpdateStatus() + "集");
+        } else if (programSimple.getUpdateStatus() != null && !programSimple.getUpdateStatus().endsWith("f")) {
+            tvPresent.setText("更新至第" + programSimple.getUpdateStatus() + "集");
             tvPresent.setVisibility(View.VISIBLE);
         } else {
             tvPresent.setText("");
             tvPresent.setVisibility(View.INVISIBLE);
         }
 
-		// 查询详情
-		Intent detailIntent = new Intent(Intent.ACTION_SYNC, null,
-				getActivity(), GetProgramDetail.class);
-        detailIntent.putExtra(Intent.EXTRA_TEXT,GetProgramDetail.class.getSimpleName());
+        // 查询详情
+        Intent detailIntent = new Intent(Intent.ACTION_SYNC, null,
+                getActivity(), GetProgramDetail.class);
+        detailIntent.putExtra(Intent.EXTRA_TEXT, GetProgramDetail.class.getSimpleName());
         Method method = new Method();
         method.setName(DoudianService.GET_PROGRAM_DETAIL);
         // this channelId will be normal channel id or special channel id
@@ -634,47 +670,31 @@ public class DetailFragment extends Fragment implements
         detailIntent.putExtra(SyncService.EXTRA_STATUS_RECEIVER, mReceiver);
         getActivity().startService(detailIntent);
 
-	}
+    }
 
-	private void startPlay() {
+    private void startPlay() {
+        mPosition = Integer.parseInt(mTextViewEpisodeIndex.getText().toString());
         Intent play = new Intent();
         play.setClass(getActivity(), PlayerActivity.class);
         play.putExtra(Intent.EXTRA_UID, new Gson().toJson(mProgramSimple));
-        play.putExtra(Intent.EXTRA_REFERRER,mPosition);
-		getActivity().startActivity(play);
-	}
+        play.putExtra(Intent.EXTRA_REFERRER, mPosition);
+        getActivity().startActivity(play);
+    }
 
-	private void showMsg(String msg) {
-		if (msg != null) {
-			Toast.makeText(getActivity(), msg, Toast.LENGTH_LONG).show();
-		}
-	}
+    private void showMsg(String msg) {
+        if (msg != null) {
+            Toast.makeText(getActivity(), msg, Toast.LENGTH_LONG).show();
+        }
+    }
 
-	private OnKeyListener btnKey = new OnKeyListener() {
-		@Override
-		public boolean onKey(View v, int keyCode, KeyEvent event) {
-			if (keyCode == KeyEvent.KEYCODE_DPAD_DOWN) {
-				int awidth = hListView.getMeasuredWidth();
-				focusheight = 246;
-				focuswidth = (int) (focusheight * 0.618f + 10);
-				FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(
-						focuswidth, focusheight);
-				lp.setMargins((awidth - focuswidth + 10) / 2, -10, 0, 0);
-				focusmask.setLayoutParams(lp);
-				hListView.centerChildRequestFocus();
-			}
-			return false;
-		}
-	};
-
-    private String getNormalChannelId(ProgramDetail pd){
+    private String getNormalChannelId(ProgramDetail pd) {
         ArrayList<Channel> channels = ChannelsHolder.getInstance().getChannelArrayList();
-        if (channels != null && channels.size() > 0){
+        if (channels != null && channels.size() > 0) {
             String[] channelArray = pd.getChannel().split("/");
-            for (int i=0;i<channelArray.length;i++){
+            for (int i = 0; i < channelArray.length; i++) {
                 String name = channelArray[i];
-                for (Channel channel:channels){
-                    if (name.equals(channel.getName())){
+                for (Channel channel : channels) {
+                    if (name.equals(channel.getName())) {
                         return channel.getId();
                     }
                 }
@@ -684,7 +704,7 @@ public class DetailFragment extends Fragment implements
             return null;
     }
 
-    private void getSourceFromHttpServer(){
+    private void getSourceFromHttpServer() {
         final Uri uri = new Uri.Builder().scheme("http")
                 .encodedAuthority("127.0.0.1:8098")
                 .encodedPath("/proxy/sitename")
@@ -697,7 +717,20 @@ public class DetailFragment extends Fragment implements
                     String[] lines = data.split("\n");
                     if (lines.length > 0) {
                         mSourcesFromHttpServer = lines[0];
-                        Log.e(TAG,"source from http server : " + mSourcesFromHttpServer);
+                        Log.e(TAG, "source from http server : " + mSourcesFromHttpServer);
+
+                        Method method = new Method();
+                        // 查询节目源
+                        Intent sourceIntent = new Intent(Intent.ACTION_SYNC, null,
+                                getActivity(), GetProgramSources.class);
+                        sourceIntent.putExtra(Intent.EXTRA_TEXT, GetProgramSources.class.getSimpleName());
+                        method.setName(DoudianService.GET_PROGRAM_SOURCES);
+                        method.setChannelID(mProgramSimple.getChannelId());
+                        method.setHashCode(mProgramSimple.getHashCode());
+                        sourceIntent.putExtra(Intent.EXTRA_UID, new Gson().toJson(method));
+                        sourceIntent.putExtra(SyncService.EXTRA_STATUS_RECEIVER, mReceiver);
+                        getActivity().startService(sourceIntent);
+
                     } else {
                         mSourcesFromHttpServer = null;
                     }

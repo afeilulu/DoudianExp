@@ -13,11 +13,8 @@ import org.slf4j.LoggerFactory;
 
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 
 import cn.com.xinli.android.doudian.model.Episode;
-import cn.com.xinli.android.doudian.model.ProgramDetail;
 import cn.com.xinli.android.doudian.service.SyncService;
 
 
@@ -55,7 +52,7 @@ public class GetProgramEpisodesByPageIoHandler extends AbstractIoHandler {
 
             result = new Gson().fromJson(result, String.class);
             ArrayList<Episode> list = new ArrayList<Episode>();
-            if (result != null){
+            if (result != null && !result.isEmpty()) {
                 String[] results = result.split(";");
                 for (int i = 0; i < results.length; i++) {
                     Episode item = new Episode();

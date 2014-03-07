@@ -2,7 +2,7 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:orientation="vertical"
-    android:padding="0dp" >
+    android:padding="0dp">
 
     <LinearLayout
         android:id="@+id/detail_work"
@@ -13,16 +13,16 @@
         android:paddingBottom="10dp"
         android:paddingLeft="30dp"
         android:paddingRight="30dp"
-        android:paddingTop="5dp" >
+        android:paddingTop="5dp">
 
         <RelativeLayout
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
             android:layout_weight="7"
             android:background="@drawable/poster_backgroud"
-            android:padding="2dp" >
+            android:padding="2dp">
 
-            <ImageView
+        <ImageView
                 android:id="@+id/tv_poster"
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
@@ -50,11 +50,11 @@
             android:layout_height="fill_parent"
             android:layout_marginLeft="20dp"
             android:layout_weight="2"
-            android:orientation="vertical" >
+            android:orientation="vertical">
 
             <RelativeLayout
                 android:layout_width="fill_parent"
-                android:layout_height="wrap_content" >
+                android:layout_height="wrap_content">
 
                 <LinearLayout
                     android:id="@+id/detail_button"
@@ -63,7 +63,47 @@
                     android:layout_alignParentRight="true"
                     android:layout_alignParentTop="true"
                     android:orientation="horizontal"
-                    android:padding="0dp" >
+                    android:padding="0dp">
+
+                    <LinearLayout
+                        android:id="@+id/episodePanel"
+                        style="?metaButtonBarStyle"
+                        android:layout_width="150dp"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:layout_below="@id/top_panel"
+                        android:layout_marginRight="151dp"
+                        android:orientation="vertical"
+                        android:visibility="visible">
+
+                        <ImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:padding="5dp"
+                            android:src="@drawable/episode_up" />
+
+                        <TextView
+                            android:id="@+id/episodeIndex"
+                            style="@style/Button_Player_Menu_Sub"
+                            android:layout_width="150dp"
+                            android:layout_height="0dp"
+                            android:layout_weight="1"
+                            android:focusable="true"
+                            android:focusableInTouchMode="true"
+                            android:gravity="center"
+                            android:nextFocusDown="@id/episodeIndex"
+                            android:nextFocusLeft="@id/episodeIndex"
+                            android:nextFocusUp="@id/episodeIndex" />
+
+                        <ImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:padding="5dp"
+                            android:src="@drawable/episode_down" />
+
+                    </LinearLayout>
 
                     <Button
                         android:id="@+id/btn_play"
@@ -73,22 +113,21 @@
                         android:background="@drawable/detail_button_selector"
                         android:clickable="false"
                         android:drawableLeft="@drawable/btn_play"
-                        android:nextFocusLeft="@id/btn_play"
                         android:text="@string/detail_play"
                         android:textColor="@color/blue_default" />
 
-                   <!-- <Button
-                        android:id="@+id/btn_actor"
-                        style="@style/Button_Black"
-                        android:layout_width="180dp"
-                        android:layout_height="wrap_content"
-                        android:background="@drawable/detail_button_selector"
-                        android:clickable="false"
-                        android:drawableLeft="@drawable/btn_actor_disable"
-                        android:focusable="false"
-                        android:focusableInTouchMode="false"
-                        android:text="@string/detail_actor"
-                        android:textColor="@color/gray" />-->
+                    <!-- <Button
+                         android:id="@+id/btn_actor"
+                         style="@style/Button_Black"
+                         android:layout_width="180dp"
+                         android:layout_height="wrap_content"
+                         android:background="@drawable/detail_button_selector"
+                         android:clickable="false"
+                         android:drawableLeft="@drawable/btn_actor_disable"
+                         android:focusable="false"
+                         android:focusableInTouchMode="false"
+                         android:text="@string/detail_actor"
+                         android:textColor="@color/gray" />-->
 
                     <Button
                         android:id="@+id/btn_favorite"
@@ -188,9 +227,9 @@
         android:background="@drawable/recommend_division"
         android:baselineAligned="false"
         android:orientation="horizontal"
-        android:padding="0dp" >
+        android:padding="0dp">
 
-        <TextView
+    <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="left"
@@ -214,15 +253,14 @@
 
     <FrameLayout
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content" >
+        android:layout_height="wrap_content">
 
         <cn.com.xinli.android.doudian.ui.widget.HorizontalListView.HorizontalVariableListView
             android:id="@+id/detail_recommend"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:paddingLeft="30dp"
-            android:paddingRight="30dp" >
-        </cn.com.xinli.android.doudian.ui.widget.HorizontalListView.HorizontalVariableListView>
+            android:paddingRight="30dp"></cn.com.xinli.android.doudian.ui.widget.HorizontalListView.HorizontalVariableListView>
 
         <ImageView
             android:id="@+id/focusmask"

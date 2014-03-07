@@ -425,7 +425,8 @@ public class PlayerActivity extends BaseActivity implements
         isPaused = true;
         lastView = null;
         addToRecent();
-        onDestroy();
+
+        finish();
     }
 
     @Override
@@ -797,6 +798,19 @@ public class PlayerActivity extends BaseActivity implements
         });
     }
 
+    private String uriPrehandle(String uri) {
+        if (uri.endsWith("m3u8")) {
+            mIsM3u8 = true;
+            if (mCurrentPosition == 0)
+                return uri + ".ts";
+            else
+                return uri + ".ts.vod." + mCurrentPosition;
+        } else
+            mIsM3u8 = false;
+
+        return uri;
+    }
+
     private Runnable onEverySecond = new Runnable() {
         public void run() {
 
@@ -832,19 +846,6 @@ public class PlayerActivity extends BaseActivity implements
             }
         }
     };
-
-    private String uriPrehandle(String uri) {
-        if (uri.endsWith("m3u8")) {
-            mIsM3u8 = true;
-            if (mCurrentPosition == 0)
-                return uri + ".ts";
-            else
-                return uri + ".ts.vod." + mCurrentPosition;
-        } else
-            mIsM3u8 = false;
-
-        return uri;
-    }
 
     /**
      * construct quality sub_menu
@@ -1233,6 +1234,8 @@ public class PlayerActivity extends BaseActivity implements
                 break;
         }
     }
+
+
 
 
 }
