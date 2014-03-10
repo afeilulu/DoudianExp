@@ -33,9 +33,7 @@ import com.loopj.android.http.AsyncHttpResponseHandler;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
 
 import cn.com.xinli.android.doudian.R;
 import cn.com.xinli.android.doudian.database.DatabaseHandler;
@@ -117,7 +115,7 @@ public class DetailFragment extends Fragment implements
     private DatabaseHandler databaseHandler;
     private ProgramSimple mProgramSimple;
     private ArrayList<Source> mSourcesList;
-    private Map<String, Collection<Episode>> mEpisodeMap;
+    //    private Map<String, Collection<Episode>> mEpisodeMap;
     private AsyncHttpClient mHttpc = new AsyncHttpClient();
     private String mSourcesFromHttpServer;
     private int mPosition;
@@ -408,7 +406,7 @@ public class DetailFragment extends Fragment implements
     @SuppressWarnings("unchecked")
     public void updateSources(Bundle bundle) {
         mSourcesList = SourceHolder.getInstance().getSourcesList();
-        mEpisodeMap = SourceHolder.getInstance().getEpisodeMap();
+//        mEpisodeMap = SourceHolder.getInstance().getEpisodeMap();
 
         if (mSourcesList != null) {
             mSourcesList.clear();
@@ -434,11 +432,11 @@ public class DetailFragment extends Fragment implements
                 btnPlay.requestFocus();
             }
 
-            if (mEpisodeMap == null) {
-                mEpisodeMap = new HashMap<String, Collection<Episode>>();
-                SourceHolder.getInstance().setEpisodeMap(mEpisodeMap);
-            } else
-                mEpisodeMap.clear();
+//            if (mEpisodeMap == null) {
+//                mEpisodeMap = new HashMap<String, Collection<Episode>>();
+//                SourceHolder.getInstance().setEpisodeMap(mEpisodeMap);
+//            } else
+//                mEpisodeMap.clear();
 
 
             // 已得到所有分集信息
@@ -456,7 +454,7 @@ public class DetailFragment extends Fragment implements
             }
 
             for (Source s : mSourcesList) {
-                mEpisodeMap.put(s.getAlias(), null);
+//                mEpisodeMap.put(s.getAlias(), null);
                 // 获取分集信息
                 Intent intent = new Intent(Intent.ACTION_SYNC, null, getActivity(),
                         GetProgramEpisodesByPage.class);
@@ -477,7 +475,8 @@ public class DetailFragment extends Fragment implements
 
     private void updateEpisode(Bundle bundle) {
 
-        mEpisodeMap = SourceHolder.getInstance().getEpisodeMap();
+//        mEpisodeMap = SourceHolder.getInstance().getEpisodeMap();
+        mSourcesList = SourceHolder.getInstance().getSourcesList();
 
         Method key = new Gson().fromJson(bundle.getString(Intent.EXTRA_UID, null), Method.class);
 
@@ -486,17 +485,38 @@ public class DetailFragment extends Fragment implements
 
         if (list != null && list.size() > 0) {
 
-            if (mEpisodeMap.get(key.getSourceAlias()) == null) {
-                mEpisodeMap.put(key.getSourceAlias(), list);
-            } else {
-                Collection<Episode> episodesList = mEpisodeMap.get(key.getSourceAlias());
-                for (Episode episode : list) {
-                    episodesList.add(episode);
+            Source source = null;
+            for (Source s : mSourcesList) {
+                if (s.getAlias().equals(key.getSourceAlias())) {
+                    source = s;
+                    break;
                 }
-                mEpisodeMap.put(key.getSourceAlias(), episodesList);
+            }
+//            if (mEpisodeMap.get(key.getSourceAlias()) == null) {
+//                mEpisodeMap.put(key.getSourceAlias(), list);
+//            } else {
+//                Collection<Episode> episodesList = mEpisodeMap.get(key.getSourceAlias());
+//                for (Episode episode : list) {
+//                    episodesList.add(episode);
+//                }
+//                mEpisodeMap.put(key.getSourceAlias(), episodesList);
+//            }
+            if (source == null) {
+                source = new Source();
+                source.setAlias(key.getSourceAlias());
+                source.setEpisodes(list);
+                mSourcesList.add(source);
+            } else {
+                ArrayList<Episode> episodes = source.getEpisodes();
+                if (episodes == null) {
+                    episodes = new ArrayList<Episode>();
+                    source.setEpisodes(episodes);
+                }
+                episodes.addAll(list);
             }
 
-            Collection<Episode> episodesList = mEpisodeMap.get(key.getSourceAlias());
+//            Collection<Episode> episodesList = mEpisodeMap.get(key.getSourceAlias());
+            Collection<Episode> episodesList = source.getEpisodes();
             int modLeft = episodesList.size() % 20;
 //            int episodePageIndex = episodesList.size() / 20 + 1;
             int episodePageIndex = key.getPageIndex() + 1;
@@ -522,7 +542,7 @@ public class DetailFragment extends Fragment implements
                 @Override
                 public void onClick(View v) {
                     mSourcesList = SourceHolder.getInstance().getSourcesList();
-                    mEpisodeMap = SourceHolder.getInstance().getEpisodeMap();
+//                    mEpisodeMap = SourceHolder.getInstance().getEpisodeMap();
 
                     if (mSourcesList == null || mSourcesList.size() == 0 || mSourcesFromHttpServer == null) {
                         showMsg("未找到播放源，请稍候再试！");
@@ -557,8 +577,13 @@ public class DetailFragment extends Fragment implements
                 @Override
                 public boolean onKey(View view, int keyCode, KeyEvent keyEvent) {
                     if (keyEvent.getAction() == KeyEvent.ACTION_DOWN) {
-                        int mEpisodeTotal;
-                        mEpisodeTotal = SourceHolder.getInstance().getEpisodeMap().get(mSiteName).size();
+                        int mEpisodeTotal = 1;
+//                        mEpisodeTotal = SourceHolder.getInstance().getEpisodeMap().get(mSiteName).size();
+                        for (Source source : mSourcesList) {
+                            if (source.getAlias().equals(mSiteName)) {
+                                mEpisodeTotal = source.getEpisodes().size();
+                            }
+                        }
                         int index = Integer.parseInt(mTextViewEpisodeIndex.getText().toString()) - 1;
                         if (keyCode == KeyEvent.KEYCODE_DPAD_UP) {
                             if (index == 0)

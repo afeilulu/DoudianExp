@@ -28,15 +28,8 @@ import cn.com.xinli.android.doudian.utils.SourceHolder;
 public class DetailEpisodeFragment extends BaseDialogFragment implements
 		DetachableResultReceiver.Receiver {
 
-	private DetachableResultReceiver mReceiver;
-
-	public DetailEpisodeFragment(FragmentManager fm, Bundle data) {
-		super(fm, data);
-	}
-
 	public final static String TAG = "DetailEpisodeFragment";
 	ArrayList<DetailSource> dslist;
-	private SelectView tvSourceList;
 	ListView leftList;
 	ListView rightListView;
 	ArrayAdapter<String> leftAdapter;
@@ -47,6 +40,12 @@ public class DetailEpisodeFragment extends BaseDialogFragment implements
 	int curPy = 0;
 	int curJm = 0;
 	int curIn = 0;
+    private DetachableResultReceiver mReceiver;
+    private SelectView tvSourceList;
+
+    public DetailEpisodeFragment(FragmentManager fm, Bundle data) {
+        super(fm, data);
+    }
 
 	@Override
 	protected View createView(LayoutInflater inflater, ViewGroup container,
@@ -223,7 +222,8 @@ public class DetailEpisodeFragment extends BaseDialogFragment implements
 
 	private void updateRight(int position) {
         Source source = SourceHolder.getInstance().getSourcesList().get(position);
-        Collection<Episode> episodeList = SourceHolder.getInstance().getEpisodeMap().get(source.getAlias());
+//        Collection<Episode> episodeList = SourceHolder.getInstance().getEpisodeMap().get(source.getAlias());
+        Collection<Episode> episodeList = source.getEpisodes();
 
         if (episodeList != null && episodeList.size() > 1){
             rightListView.setVisibility(View.VISIBLE);

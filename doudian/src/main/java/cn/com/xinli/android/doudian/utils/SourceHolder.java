@@ -1,10 +1,7 @@
 package cn.com.xinli.android.doudian.utils;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Map;
 
-import cn.com.xinli.android.doudian.model.Episode;
 import cn.com.xinli.android.doudian.model.Source;
 
 /**
@@ -15,7 +12,7 @@ public class SourceHolder {
 
     private static final SourceHolder holder = new SourceHolder();
     private ArrayList<Source> sourcesList;
-    private Map<String, Collection<Episode>> episodeMap;
+//    private Map<String, Collection<Episode>> episodeMap;
 
     public static SourceHolder getInstance() {
         return holder;
@@ -29,20 +26,20 @@ public class SourceHolder {
         this.sourcesList = sourcesList;
     }
 
-    public Map<String, Collection<Episode>> getEpisodeMap() {
-        return episodeMap;
-    }
+//    public Map<String, Collection<Episode>> getEpisodeMap() {
+//        return episodeMap;
+//    }
 
-    public void setEpisodeMap(Map<String, Collection<Episode>> episodeMap) {
-        this.episodeMap = episodeMap;
-    }
+//    public void setEpisodeMap(Map<String, Collection<Episode>> episodeMap) {
+//        this.episodeMap = episodeMap;
+//    }
 
     public void clear(){
         if (sourcesList != null)
             sourcesList.clear();
 
-        if (episodeMap != null)
-            episodeMap.clear();
+//        if (episodeMap != null)
+//            episodeMap.clear();
     }
 
 }

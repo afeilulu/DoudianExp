@@ -40,7 +40,6 @@ import com.loopj.android.http.AsyncHttpResponseHandler;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.Map;
 
 import cn.com.xinli.android.doudian.R;
 import cn.com.xinli.android.doudian.database.DatabaseHandler;
@@ -164,7 +163,7 @@ public class PlayerActivity extends BaseActivity implements
      */
     private ControlHider mTopPanelHider;
     private Collection<Source> mSourcesList;
-    private Map<String, Collection<Episode>> mEpisodeMap;
+    //    private Map<String, Collection<Episode>> mEpisodeMap;
     private String mSiteName;
     private String mPlayPage;
     private int mEpisodeIndex;
@@ -288,7 +287,7 @@ public class PlayerActivity extends BaseActivity implements
         setContentView(R.layout.activity_player);
 
         mSourcesList = SourceHolder.getInstance().getSourcesList();
-        mEpisodeMap = SourceHolder.getInstance().getEpisodeMap();
+//        mEpisodeMap = SourceHolder.getInstance().getEpisodeMap();
         mProgramSimple = new Gson().fromJson(getIntent().getStringExtra(Intent.EXTRA_UID), ProgramSimple.class);
         mEpisodeIndex = getIntent().getIntExtra(Intent.EXTRA_REFERRER, 0);
 
@@ -431,7 +430,13 @@ public class PlayerActivity extends BaseActivity implements
             return true;
 
         if (getCurrentFocus().getId() == episodeButton.getId()) {
-            mEpisodeTotal = SourceHolder.getInstance().getEpisodeMap().get(mSiteName).size();
+//            mEpisodeTotal = SourceHolder.getInstance().getEpisodeMap().get(mSiteName).size();
+            for (Source source : mSourcesList) {
+                if (source.getAlias().equals(mSiteName)) {
+                    mEpisodeTotal = source.getEpisodes().size();
+                    break;
+                }
+            }
             int index = Integer.parseInt(mTextEpisodeIndex.getText().toString()) - 1;
             if (keyCode == KeyEvent.KEYCODE_DPAD_UP) {
                 if (index == 0)
@@ -673,9 +678,11 @@ public class PlayerActivity extends BaseActivity implements
     }
 
     private String getEpisodeWebPageUrl(String sourceAlias, int position) {
+
         String playUrl = null;
 
-        if (mSourcesList == null || mEpisodeMap == null) {
+//        if (mSourcesList == null || mEpisodeMap == null) {
+        if (mSourcesList == null) {
             Log.e(TAG, "source all null-----------------------------------");
             return null;
         }
@@ -688,9 +695,10 @@ public class PlayerActivity extends BaseActivity implements
                 mSiteName = source.getAlias();
                 sourceAlias = mSiteName;
 
-                Object[] episodes = mEpisodeMap.get(sourceAlias).toArray();
-                if (position < episodes.length) {
-                    Episode episode = (Episode) episodes[position];
+//                Object[] episodes = mEpisodeMap.get(sourceAlias).toArray();
+                ArrayList<Episode> episodes = source.getEpisodes();
+                if (position < episodes.size()) {
+                    Episode episode = episodes.get(position);
                     playUrl = source.getUrlPrefix() + "/" + episode.getUrl();
                     Log.d(TAG, "playUrl=" + playUrl);
                     break;
@@ -699,9 +707,10 @@ public class PlayerActivity extends BaseActivity implements
 
             if (source.getAlias().equals(sourceAlias)) {
                 mSiteName = source.getAlias();
-                Object[] episodes = mEpisodeMap.get(sourceAlias).toArray();
-                if (position < episodes.length) {
-                    Episode episode = (Episode) episodes[position];
+//                Object[] episodes = mEpisodeMap.get(sourceAlias).toArray();
+                ArrayList<Episode> episodes = source.getEpisodes();
+                if (position < episodes.size()) {
+                    Episode episode = episodes.get(position);
                     playUrl = source.getUrlPrefix() + "/" + episode.getUrl();
                     Log.e(TAG, "playUrl=" + playUrl);
                     break;
@@ -807,6 +816,33 @@ public class PlayerActivity extends BaseActivity implements
         }
     }
 
+    /**
+     * construct sources sub_menu from source holder
+     */
+    private void setUpSubMenuSources() {
+
+        ((ViewGroup) sourcePanel).removeAllViews();
+        for (Source source : SourceHolder.getInstance().getSourcesList()) {
+            addNewSubMenuButtonOfSource(source);
+        }
+
+        // the first source is selected in default
+        if (mSiteName == null) {
+            View view = ((ViewGroup) sourcePanel).getChildAt(0);
+            if (view != null) {
+                mSiteName = view.getTag().toString();
+                view.setBackgroundResource(R.drawable.player_menu_button_selected);
+                view.setPadding(10, 10, 10, 10);
+            }
+        }
+
+        if (((ViewGroup) sourcePanel).getChildCount() > 0) {
+            View view = ((ViewGroup) sourcePanel).getChildAt(((ViewGroup) sourcePanel).getChildCount() - 1);
+            view.setNextFocusDownId(view.getId());
+        }
+
+    }
+
     private Runnable onEverySecond = new Runnable() {
         public void run() {
 
@@ -842,33 +878,6 @@ public class PlayerActivity extends BaseActivity implements
             }
         }
     };
-
-    /**
-     * construct sources sub_menu from source holder
-     */
-    private void setUpSubMenuSources() {
-
-        ((ViewGroup) sourcePanel).removeAllViews();
-        for (Source source : SourceHolder.getInstance().getSourcesList()) {
-            addNewSubMenuButtonOfSource(source);
-        }
-
-        // the first source is selected in default
-        if (mSiteName == null) {
-            View view = ((ViewGroup) sourcePanel).getChildAt(0);
-            if (view != null) {
-                mSiteName = view.getTag().toString();
-                view.setBackgroundResource(R.drawable.player_menu_button_selected);
-                view.setPadding(10, 10, 10, 10);
-            }
-        }
-
-        if (((ViewGroup) sourcePanel).getChildCount() > 0) {
-            View view = ((ViewGroup) sourcePanel).getChildAt(((ViewGroup) sourcePanel).getChildCount() - 1);
-            view.setNextFocusDownId(view.getId());
-        }
-
-    }
 
     private void addToRecent() {
         Recent item = new Recent();

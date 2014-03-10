@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
      Copyright (C) 2011 The Android Open Source Project
 
      Licensed under the Apache License, Version 2.0 (the "License");
@@ -32,7 +31,7 @@
     <string name="tab_title_1">首页</string>
     <string name="tab_title_2">点播</string>
     <string name="tab_title_3">设置</string>
-    
+
     <string name="mydoudian">我的逗点</string>
     <string name="recent_look">最近观看</string>
     <string name="myfavorite">我的收藏</string>
@@ -40,7 +39,7 @@
     <string name="no_persuit">您目前无关注节目！</string>
     <string name="no_favorite">您目前无收藏节目！</string>
     <string name="no_recent">您还没有观看节目！</string>
-    
+
     <string name="clear_persuit">您要清空所有关注节目吗？</string>
     <string name="clear_favorite">您要清空所有收藏节目吗？</string>
     <string name="clear_recent">您要清空观看历史记录吗？</string>
@@ -48,16 +47,17 @@
     <string name="dialog_cancel">取消</string>
     <string name="error_loading">抱歉，没有获取到节目。</string>
     <string name="loading">节目加载中......</string>
-    
+
     <string name="network_failure">网络连接失败</string>
     <string name="auth_failure">认证失败</string>
     <string name="no_auth_module">抱歉，没有发现认证模块</string>
-    
-    <string name="position_key">position_key</string> <!-- for horizontal listview --> 
-    
+
+    <string name="position_key">position_key</string>
+    <!-- for horizontal listview -->
+
     <string name="search">Search</string>
     <string name="cool_places">Cool Places</string>
-    
+
     <string name="search_hint">e.g. “New York”, “Beijing”, “Paris”...</string>
     <string name="menu_map">Map</string>
     <string name="menu_author">Author info</string>
@@ -94,7 +94,7 @@
     <string name="search_result">搜索结果</string>
     <string name="network_timeout">网络超时，请稍侯再试！</string>
     <string name="roll_widget_init">正在更新，请稍候</string>
-    
+
     <string name="detail_titile">详情</string>
     <string name="detail_play">播放</string>
     <string name="detail_actor">人物</string>
@@ -103,30 +103,30 @@
     <string name="detail_attention">关注</string>
     <string name="detail_attentioned">已关注</string>
     <string name="detail_recommend">相关推荐</string>
-    
+
     <string name="version_desc">版本信息</string>
     <string name="back_press_quit">再按一次返回退出</string>
-    
+
     <string name="default_time">00:00:00</string>
-	<string name="str_sign">/</string>
-	
-	<string name="err_play_timeout_message">  网络原因加载缓慢， 可通过切换其他节目观看。</string>
-	<string name="err_get_videos_message">获取节目信息失败，请退出重试！</string>
-	<string name="err_playing_net_message">播放中网络不稳定！</string>
-	<string name="err_conn_serv_message">  服务器连接中 </string>
-	<string name="err_get_use_vidio_message">  播放源不可用  </string>
-	<string name="err_conn_serv_toast_message">  服务器连接失败,请尝试重新播放或者重启盒子  </string>
-	<string name="err_get_use_vidio_toast_message">  播放源或播放插件不可用，请更换节目观看或联系客服  </string>
-	<string name="err_playing_message">  没有发现可以播放的节目 </string>
-	<string name="vidio_progress_help_str_h">  当出现卡顿或者缓冲过慢时，可通过切换清晰度更改“标清”节目进行观看。 </string>
-	<string name="vidio_progress_help_str_m">  当出现卡顿或者缓冲过慢时，可更换“节目源”进行观看。 </string>
-	<string name="video_list_help">按【左右键】切换清晰度</string>
-	<string name="video_bottom_help_l">按【</string>
-	<string name="video_bottom_help">/菜单键】打开选集/选清晰度菜单</string>
-	<string name="videolist_bottom_tips_l">按【</string>
-	<string name="videolist_bottom_tips"> /菜单键】可以删除选中影片</string>
-	
-	<string name="checking_pgrade">正在检查是否有升级版本...</string>
+    <string name="str_sign">/</string>
+
+    <string name="err_play_timeout_message">  网络原因加载缓慢， 可通过切换其他节目观看。</string>
+    <string name="err_get_videos_message">获取节目信息失败，请退出重试！</string>
+    <string name="err_playing_net_message">播放中网络不稳定！</string>
+    <string name="err_conn_serv_message">  服务器连接中 </string>
+    <string name="err_get_use_vidio_message">  播放源不可用  </string>
+    <string name="err_conn_serv_toast_message">  服务器连接失败,请尝试重新播放或者重启盒子  </string>
+    <string name="err_get_use_vidio_toast_message">  播放源或播放插件不可用，请更换节目观看或联系客服  </string>
+    <string name="err_playing_message">  没有发现可以播放的节目 </string>
+    <string name="vidio_progress_help_str_h">  当出现卡顿或者缓冲过慢时，可通过切换清晰度更改“标清”节目进行观看。 </string>
+    <string name="vidio_progress_help_str_m">  当出现卡顿或者缓冲过慢时，可更换“节目源”进行观看。 </string>
+    <string name="video_list_help">按【左右键】切换清晰度</string>
+    <string name="video_bottom_help_l">按【</string>
+    <string name="video_bottom_help">/菜单键】打开选集/选清晰度菜单</string>
+    <string name="videolist_bottom_tips_l">按【</string>
+    <string name="videolist_bottom_tips"> /菜单键】可以删除选中影片</string>
+
+    <string name="checking_pgrade">正在检查是否有升级版本...</string>
     <string name="no_pgrade">检查升级包完成，没有发现新的升级版本</string>
     <string name="ready_download">检查升级包完成，发现新的升级版本，开始准备下载...</string>
     <string name="checking_network">正在检查网络...</string>
@@ -145,7 +145,7 @@
     <string name="mac">MAC:</string>
     <string name="chk_network_err">未连接网络，请检查网络</string>
     <string name="backmsg">,按返回键退出</string>
-    
+
     <string name="expired_tip">本软件使用已到期。</string>
     <string name="expired_on">本软件将在<xliff:g id="datestr">%1$s</xliff:g>停止使用。</string>
 
@@ -166,11 +166,4 @@
     <string name="quality_1280">超 清</string>
     <string name="quality_1920">蓝 光</string>
 
-    <!--<string name="site_qq">腾 讯</string>
-    <string name="site_qiyi">爱奇艺</string>
-    <string name="site_funshion">风 行</string>
-    <string name="site_sohu">搜 狐</string>
-    <string name="site_youku">优 酷</string>
-    <string name="site_tudou">土 豆</string>
-    <string name="site_pptv">PPTV</string>-->
 </resources>
