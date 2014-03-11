@@ -64,14 +64,9 @@ public class StreamProxy {
                 @Override
                 public void run() {
                     try {
-                        Process streamProxyProcess = Runtime.getRuntime().exec(sp, null, f);
+                        streamProxyProcess = Runtime.getRuntime().exec(sp, null, f);
                         statusCode = 0;
-                        int exitVal = streamProxyProcess.waitFor();
-                        Log.d(TAG, "run streamproxy exit value = " + exitVal);
                     } catch (IOException e) {
-                        statusCode = -1;
-                    } catch (InterruptedException e) {
-                        Log.d(TAG, "streamproxy crashed");
                         statusCode = -1;
                     }
                 }

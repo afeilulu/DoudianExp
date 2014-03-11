@@ -7,7 +7,6 @@ package cn.com.xinli.android.doudian.ui.tv;
 import android.annotation.TargetApi;
 import android.app.AlertDialog;
 import android.content.Intent;
-import android.graphics.PixelFormat;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
@@ -297,8 +296,8 @@ public class PlayerActivity extends BaseActivity implements
         surface.addTapListener(onTap);
         holder = surface.getHolder();
         holder.addCallback(this);
-        holder.setFormat(PixelFormat.TRANSLUCENT);
-        holder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
+//        holder.setFormat(PixelFormat.TRANSLUCENT);
+//        holder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
         surface.setZOrderOnTop(false);
 
         topPanel = findViewById(R.id.top_panel);
@@ -391,6 +390,7 @@ public class PlayerActivity extends BaseActivity implements
         super.onPause();
         isPaused = true;
         lastView = null;
+        surface.setVisibility(View.GONE);
         addToRecent();
 
         finish();
@@ -463,12 +463,14 @@ public class PlayerActivity extends BaseActivity implements
     }
 
     public void onCompletion(MediaPlayer mediaPlayer) {
-
+        Log.e(TAG, "onCompletion");
         // reset timeline position
         m3u8LastSeekPosition = 0;
         mCurrentPosition = 0;
-        mHdAll.clear();
-        mHdAll = null;
+        if (mHdAll != null) {
+            mHdAll.clear();
+            mHdAll = null;
+        }
 
         // go to play next or quit
         mEpisodeIndex++;
@@ -723,6 +725,7 @@ public class PlayerActivity extends BaseActivity implements
 
     private void detect() {
 
+        media.setVisibility(View.INVISIBLE);
         findViewById(R.id.waiting).setVisibility(View.VISIBLE);
 
         mPlayPage = getEpisodeWebPageUrl(mSiteName, mEpisodeIndex);
@@ -843,6 +846,22 @@ public class PlayerActivity extends BaseActivity implements
 
     }
 
+    private void addToRecent() {
+        Recent item = new Recent();
+        item.setHashCode(mProgramSimple.getHashCode());
+        item.setName(mProgramSimple.getName());
+        item.setPoster(mProgramSimple.getPoster());
+        item.setUpdateStatus(mProgramSimple.getUpdateStatus());
+        item.setChannelId(mProgramSimple.getChannelId());
+        item.setSource(mSiteName);
+        item.setEpisode(mEpisodeIndex);
+        item.setDurationInSec(mDuration);
+        item.setCurrentPositionInSec(timeline.getProgress());
+        databaseHandler.deleteRecent(item);
+        databaseHandler.addRecent(item);
+
+    }
+
     private Runnable onEverySecond = new Runnable() {
         public void run() {
 
@@ -878,22 +897,6 @@ public class PlayerActivity extends BaseActivity implements
             }
         }
     };
-
-    private void addToRecent() {
-        Recent item = new Recent();
-        item.setHashCode(mProgramSimple.getHashCode());
-        item.setName(mProgramSimple.getName());
-        item.setPoster(mProgramSimple.getPoster());
-        item.setUpdateStatus(mProgramSimple.getUpdateStatus());
-        item.setChannelId(mProgramSimple.getChannelId());
-        item.setSource(mSiteName);
-        item.setEpisode(mEpisodeIndex);
-        item.setDurationInSec(mDuration);
-        item.setCurrentPositionInSec(timeline.getProgress());
-        databaseHandler.deleteRecent(item);
-        databaseHandler.addRecent(item);
-
-    }
 
     /**
      * sample:
