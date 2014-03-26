@@ -58,6 +58,7 @@ import cn.com.xinli.android.doudian.utils.ImageDownloaderLruCache;
 import cn.com.xinli.android.doudian.utils.ImageObjectCache;
 import cn.com.xinli.android.doudian.utils.ImageObjectCache.ImageCacheParams;
 import cn.com.xinli.android.doudian.utils.SourceHolder;
+import cn.com.xinli.android.doudian.utils.StreamProxy;
 import cn.com.xinli.android.doudian.utils.UIUtils;
 
 public class DetailFragment extends Fragment implements
@@ -119,10 +120,14 @@ public class DetailFragment extends Fragment implements
     private AsyncHttpClient mHttpc = new AsyncHttpClient();
     private String mSourcesFromHttpServer;
     private int mPosition;
+    private StreamProxy mProxy;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        streamProxyStart();
+
         mReceiver = new DetachableResultReceiver(new Handler());
         mReceiver.setReceiver(this);
         hostory = new ArrayList<String>();
@@ -699,11 +704,14 @@ public class DetailFragment extends Fragment implements
 
     private void startPlay() {
         mPosition = Integer.parseInt(mTextViewEpisodeIndex.getText().toString()) - 1;
-        Intent play = new Intent();
-        play.setClass(getActivity(), PlayerActivity.class);
-        play.putExtra(Intent.EXTRA_UID, new Gson().toJson(mProgramSimple));
-        play.putExtra(Intent.EXTRA_REFERRER, mPosition);
-        getActivity().startActivity(play);
+        if (mProxy != null && mProxy.mHost != null) {
+            Intent play = new Intent();
+            play.setClass(getActivity(), PlayerActivity.class);
+            play.putExtra(Intent.EXTRA_UID, new Gson().toJson(mProgramSimple));
+            play.putExtra(Intent.EXTRA_REFERRER, mPosition);
+            play.putExtra(Intent.EXTRA_SHORTCUT_NAME, mProxy.mHost);
+            getActivity().startActivity(play);
+        }
     }
 
     private void showMsg(String msg) {
@@ -731,7 +739,7 @@ public class DetailFragment extends Fragment implements
 
     private void getSourceFromHttpServer() {
         final Uri uri = new Uri.Builder().scheme("http")
-                .encodedAuthority("127.0.0.1:8098")
+                .encodedAuthority(mProxy.mHost)
                 .encodedPath("/proxy/sitename")
                 .build();
         mHttpc.get(uri.toString(), null, new AsyncHttpResponseHandler() {
@@ -774,4 +782,39 @@ public class DetailFragment extends Fragment implements
         });
     }
 
+    private void streamProxyStart() {
+        if (mProxy == null) {
+
+            mProxy = new StreamProxy(getActivity(), new StreamProxy.OnStateListener() {
+
+                @Override
+                public void onStarted(boolean success, int extra) {
+                    if (success) {
+                        Log.e(TAG, "StreamProxy started, pid - " + extra);
+                    } else {
+                        Log.e(TAG, "StreamProxy start failed, error code - " + extra);
+                    }
+                }
+
+                @Override
+                public void onProxyStatus(String statusLine) {
+                    Log.e(TAG, "StreamProxy status: " + statusLine);
+                }
+
+                @Override
+                public void onExit(boolean normal) {
+                    Log.e(TAG, "StreamProxy exit, normal - " + normal);
+                }
+            });
+        }
+        mProxy.start();
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+
+        if (mProxy != null)
+            mProxy.stop();
+    }
 }

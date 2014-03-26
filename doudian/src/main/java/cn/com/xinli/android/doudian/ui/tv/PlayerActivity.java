@@ -5,7 +5,6 @@ package cn.com.xinli.android.doudian.ui.tv;
  */
 
 import android.annotation.TargetApi;
-import android.app.AlertDialog;
 import android.content.Intent;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
@@ -18,7 +17,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.SystemClock;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -30,7 +28,9 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.loopj.android.http.AsyncHttpClient;
@@ -38,7 +38,9 @@ import com.loopj.android.http.AsyncHttpResponseHandler;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 import cn.com.xinli.android.doudian.R;
 import cn.com.xinli.android.doudian.database.DatabaseHandler;
@@ -127,6 +129,7 @@ public class PlayerActivity extends BaseActivity implements
     private TextView mTextEpisodeIndex = null;
     private View lastView = null;
     private TextView mProgresssTextView = null;
+    private TextView mDurationTextView = null;
     private boolean mAnimationStartFromNow = false;
     View.OnFocusChangeListener OnMenuFocusChangeListener = new View.OnFocusChangeListener() {
         @Override
@@ -136,12 +139,11 @@ public class PlayerActivity extends BaseActivity implements
             }
         }
     };
-    private long lastActionTime = 0L;
+    private int mLastPlayPosition;
+    private boolean mPlayerFromStart;
     private TappableSurfaceView.TapListener onTap =
             new TappableSurfaceView.TapListener() {
                 public void onTap(MotionEvent event) {
-                    lastActionTime = SystemClock.elapsedRealtime();
-
 //                    if (event.getY() < surface.getHeight() / 2) {
 //                        topPanel.setVisibility(View.VISIBLE);
 //                    } else {
@@ -157,11 +159,16 @@ public class PlayerActivity extends BaseActivity implements
     private boolean isPaused = false;
     private TransparentThumbSeekBar timeline = null;
     private ImageView media = null;
+    private TextView whereyougo = null;
+    private ProgressBar mWaiting = null;
+    //    private StreamProxy mProxy;
+    private String mHost;
     /**
      * The instance of the {@link cn.com.xinli.android.doudian.utils.ControlHider} for this activity.
      */
     private ControlHider mTopPanelHider;
     private Collection<Source> mSourcesList;
+    private Map<String, Boolean> mSourceAutoSwitchStatus;// String is source alias,Boolean true means this source has been detected or not.
     //    private Map<String, Collection<Episode>> mEpisodeMap;
     private String mSiteName;
     private String mPlayPage;
@@ -204,8 +211,14 @@ public class PlayerActivity extends BaseActivity implements
                 if (index - 1 != mEpisodeIndex) {
                     mEpisodeIndex = index - 1;
 
+                    // reset timeline position
+                    m3u8LastSeekPosition = 0;
                     mCurrentPosition = 0;
                     setFlagOfProgress(mCurrentPosition);
+                    if (mHdAll != null) {
+                        mHdAll.clear();
+                        mHdAll = null;
+                    }
 
                     detect();
                     return;
@@ -225,8 +238,29 @@ public class PlayerActivity extends BaseActivity implements
     private View.OnClickListener onSourceChange = new View.OnClickListener() {
         public void onClick(View v) {
             if (!v.getTag().toString().equals(mSiteName)) {
+
+                boolean noEpisodeInSource = false;
+                String tmpSource = v.getTag().toString();
+                for (Source source : mSourcesList) {
+                    if (source.getAlias().equals(tmpSource)) {
+                        if (mEpisodeIndex >= source.getEpisodes().size()) {
+                            Throwable throwable = new Throwable("7:no episode in this source;" + source.getName());
+                            goBlooey(throwable);
+                            noEpisodeInSource = true;
+                            break;
+                        }
+                    }
+                }
+                if (noEpisodeInSource)
+                    return;
+
                 mSiteName = v.getTag().toString();
                 mCurrentPosition = timeline.getProgress();
+
+                if (mCurrentPosition > 0)
+                    mPlayerFromStart = false;
+                else
+                    mPlayerFromStart = true;
 
                 // change selected background
                 v.setBackgroundResource(R.drawable.player_menu_button_selected);
@@ -286,9 +320,15 @@ public class PlayerActivity extends BaseActivity implements
         setContentView(R.layout.activity_player);
 
         mSourcesList = SourceHolder.getInstance().getSourcesList();
-//        mEpisodeMap = SourceHolder.getInstance().getEpisodeMap();
+        mSourceAutoSwitchStatus = new HashMap<String, Boolean>();
+        for (Source source : mSourcesList) {
+            // no detected anyone at first
+            mSourceAutoSwitchStatus.put(source.getAlias(), false);
+            Log.e(TAG, source.getAlias());
+        }
         mProgramSimple = new Gson().fromJson(getIntent().getStringExtra(Intent.EXTRA_UID), ProgramSimple.class);
         mEpisodeIndex = getIntent().getIntExtra(Intent.EXTRA_REFERRER, 0);
+        mHost = getIntent().getStringExtra(Intent.EXTRA_SHORTCUT_NAME);
 
         databaseHandler = new DatabaseHandler(this);
 
@@ -306,6 +346,8 @@ public class PlayerActivity extends BaseActivity implements
         timeline = (TransparentThumbSeekBar) findViewById(R.id.timeline);
 
         media = (ImageView) findViewById(R.id.media);
+        whereyougo = (TextView) findViewById(R.id.where_you_go);
+        mWaiting = (ProgressBar) findViewById(R.id.waiting);
 
         sizeSelectorPanel = findViewById(R.id.sizeSelectorPanel);
         qualityPanel = findViewById(R.id.qualityPanel);
@@ -336,6 +378,7 @@ public class PlayerActivity extends BaseActivity implements
         findViewById(R.id.sizeRatio).setOnClickListener(onSizeChange);
 
         mProgresssTextView = (TextView) findViewById(R.id.progress_text);
+        mDurationTextView = (TextView) findViewById(R.id.duration);
 
         // Set up an instance of SystemUiHider to control the system UI for
         // this activity.
@@ -349,7 +392,7 @@ public class PlayerActivity extends BaseActivity implements
                     public void onVisibilityChange(final boolean visible) {
                         topPanel.setAlpha(visible ? 0.7f : 0f);
                         View focusedMenu = findViewById(mMenuId);
-                        if (focusedMenu != null){
+                        if (focusedMenu != null) {
                             focusedMenu.requestFocus();
                             subMenuToggle2(focusedMenu);
                         } else {
@@ -363,6 +406,8 @@ public class PlayerActivity extends BaseActivity implements
 
         // Avoiding Clipping when Animating a View on top of a SurfaceView
         ((ViewGroup) surface.getParent()).addView(new View(this));
+
+        mPlayerFromStart = true;
     }
 
     @Override
@@ -384,6 +429,7 @@ public class PlayerActivity extends BaseActivity implements
         mAnimationStartFromNow = false;
         isPaused = false;
         surface.postDelayed(onEverySecond, 1000);
+        surface.postDelayed(onEvery3Second, 2000);
 
         detect();
     }
@@ -391,10 +437,24 @@ public class PlayerActivity extends BaseActivity implements
     @Override
     protected void onPause() {
         super.onPause();
+
         isPaused = true;
         lastView = null;
+
         surface.setVisibility(View.GONE);
+
         addToRecent();
+
+        if (player != null) {
+            player.stop();
+            player.release();
+            player = null;
+        }
+
+        surface.removeTapListener(onTap);
+
+//        if (mProxy != null)
+//            mProxy.stop();
 
         finish();
     }
@@ -402,13 +462,6 @@ public class PlayerActivity extends BaseActivity implements
     @Override
     protected void onDestroy() {
         super.onDestroy();
-
-        if (player != null) {
-            player.release();
-            player = null;
-        }
-
-        surface.removeTapListener(onTap);
     }
 
     @Override
@@ -459,8 +512,6 @@ public class PlayerActivity extends BaseActivity implements
                 return true;
             }
         }
-
-        lastActionTime = SystemClock.elapsedRealtime();
 
         return (super.onKeyDown(keyCode, event));
     }
@@ -596,13 +647,73 @@ public class PlayerActivity extends BaseActivity implements
     }
 
     private void goBlooey(Throwable t) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        /*AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
         builder
                 .setTitle("Exception!")
                 .setMessage(t.toString())
                 .setPositiveButton("OK", null)
-                .show();
+                .show();*/
+
+        boolean needToCheckAnotherSource = false;
+        int errorStringR = R.string.player_error_0;
+        if (t.getMessage().startsWith("1")) {
+            errorStringR = R.string.player_error_1;
+        } else if (t.getMessage().startsWith("2")) {
+            needToCheckAnotherSource = true;
+            errorStringR = R.string.player_error_2;
+        } else if (t.getMessage().startsWith("3")) {
+            needToCheckAnotherSource = true;
+            errorStringR = R.string.player_error_3;
+        } else if (t.getMessage().startsWith("4")) {
+            needToCheckAnotherSource = true;
+            errorStringR = R.string.player_error_4;
+        } else if (t.getMessage().startsWith("5")) {
+            needToCheckAnotherSource = true;
+            errorStringR = R.string.player_error_5;
+        } else if (t.getMessage().startsWith("6")) {
+            errorStringR = R.string.player_error_6;
+        } else if (t.getMessage().startsWith("7")) {
+            String[] tmpStr = t.getMessage().split(";");
+            if (tmpStr.length > 1) {
+                errorStringR = R.string.player_error_7;
+                Toast.makeText(getApplicationContext(), tmpStr[1] + getResources().getString(errorStringR), Toast.LENGTH_SHORT).show();
+            }
+            return;
+        }
+
+        if (needToCheckAnotherSource) {
+            // now we start to switch another unchecked source
+            // if none exists, exit this activity
+            boolean unCheckedSourceExisted = false;
+            for (Map.Entry entry : mSourceAutoSwitchStatus.entrySet()) {
+                Boolean checked = (Boolean) entry.getValue();
+                if (!checked.booleanValue()) {
+                    mSiteName = (String) entry.getKey();
+                    unCheckedSourceExisted = true;
+                    break;
+                }
+            }
+            if (unCheckedSourceExisted) {
+                for (int i = 0; i < ((ViewGroup) sourcePanel).getChildCount(); i++) {
+                    View view = ((ViewGroup) sourcePanel).getChildAt(i);
+                    if (view.getTag().toString().equals(mSiteName)) {
+                        view.setBackgroundResource(R.drawable.player_menu_button_selected);
+                    } else {
+                        view.setBackgroundResource(R.drawable.player_menu_button_normal);
+                    }
+                    view.setPadding(10, 10, 10, 10);
+                }
+
+                detect();
+            } else {
+                Toast.makeText(getApplicationContext(), errorStringR, Toast.LENGTH_SHORT).show();
+                finish();
+            }
+        } else {
+            Toast.makeText(getApplicationContext(), errorStringR, Toast.LENGTH_SHORT).show();
+            finish();
+        }
     }
 
     public void keepRatio(View view) {
@@ -661,7 +772,6 @@ public class PlayerActivity extends BaseActivity implements
     }
 
     private void playPauseToggle() {
-        lastActionTime = SystemClock.elapsedRealtime();
 
         if (player != null) {
             if (player.isPlaying() && !mTopPanelHider.isVisible()) {
@@ -686,11 +796,12 @@ public class PlayerActivity extends BaseActivity implements
 
         String playUrl = null;
 
-//        if (mSourcesList == null || mEpisodeMap == null) {
         if (mSourcesList == null) {
             Log.e(TAG, "source all null-----------------------------------");
             return null;
         }
+
+        boolean noEpisodeOnThisSource = false;
 
         Iterator iterator = mSourcesList.iterator();
         while (iterator.hasNext()) {
@@ -700,7 +811,6 @@ public class PlayerActivity extends BaseActivity implements
                 mSiteName = source.getAlias();
                 sourceAlias = mSiteName;
 
-//                Object[] episodes = mEpisodeMap.get(sourceAlias).toArray();
                 ArrayList<Episode> episodes = source.getEpisodes();
                 if (position < episodes.size()) {
                     Episode episode = episodes.get(position);
@@ -708,38 +818,80 @@ public class PlayerActivity extends BaseActivity implements
                     Log.d(TAG, "playUrl=" + playUrl);
                     break;
                 }
-            }
 
-            if (source.getAlias().equals(sourceAlias)) {
-                mSiteName = source.getAlias();
-//                Object[] episodes = mEpisodeMap.get(sourceAlias).toArray();
+            } else {
+
+                if (source.getAlias().equals(sourceAlias)) {
+                    mSiteName = source.getAlias();
+                    ArrayList<Episode> episodes = source.getEpisodes();
+                    if (position < episodes.size()) {
+                        Episode episode = episodes.get(position);
+                        playUrl = source.getUrlPrefix() + "/" + episode.getUrl();
+                        Log.e(TAG, "playUrl=" + playUrl);
+                        break;
+                    } else {
+                        noEpisodeOnThisSource = true;
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (noEpisodeOnThisSource) {
+            // we need play on another source which has the episode
+            while (iterator.hasNext()) {
+                Source source = (Source) iterator.next();
                 ArrayList<Episode> episodes = source.getEpisodes();
                 if (position < episodes.size()) {
                     Episode episode = episodes.get(position);
                     playUrl = source.getUrlPrefix() + "/" + episode.getUrl();
-                    Log.e(TAG, "playUrl=" + playUrl);
+                    mSiteName = source.getAlias();
+                    Log.d(TAG, "playUrl=" + playUrl);
                     break;
                 }
             }
         }
+
+        // yes,this source is checked and do not care the result
+        mSourceAutoSwitchStatus.put(mSiteName, true);
 
         return playUrl;
     }
 
     private void detect() {
 
+//        if (mProxy == null || mProxy.mHost == null) {
+        if (mHost == null) {
+            Throwable throwable = new Throwable("1:HttpServer is not ready!");
+            goBlooey(throwable);
+            return;
+        }
+
+        mWaiting.setAlpha(1);
+        whereyougo.setAlpha(1);
         media.setVisibility(View.INVISIBLE);
-        findViewById(R.id.waiting).setVisibility(View.VISIBLE);
+        mWaiting.setVisibility(View.VISIBLE);
 
         mPlayPage = getEpisodeWebPageUrl(mSiteName, mEpisodeIndex);
-        if (mPlayPage == null) {
-            Throwable throwable = new Throwable("play url is null!");
+
+        String siteName = mSiteName;
+        for (Source source : SourceHolder.getInstance().getSourcesList()) {
+            if (source.getAlias().equals(mSiteName)) {
+                siteName = source.getName();
+                break;
+            }
+        }
+        whereyougo.setText("正在前往" + siteName + "为您播放");
+        whereyougo.setVisibility(View.VISIBLE);
+
+        if (mPlayPage == null || mPlayPage.isEmpty()) {
+            Throwable throwable = new Throwable("2:play url is null!");
             goBlooey(throwable);
             return;
         }
 
         final Uri uri = new Uri.Builder().scheme("http")
-                .encodedAuthority("127.0.0.1:8098")
+                .encodedAuthority(mHost)
                 .encodedPath("/proxy/detect")
                 .appendQueryParameter("sitename", mSiteName)
                 .appendQueryParameter("videokey", "[" + mHd + "]" + mPlayPage)
@@ -755,6 +907,12 @@ public class PlayerActivity extends BaseActivity implements
                         if (mHdAll == null || mHdAll.size() == 0) {
                             videoInfoParse(mDetectResult);
                             setUpSubMenuQuality();
+
+                            // set position on first load
+                            if (mPlayerFromStart) {
+                                mCurrentPosition = 0;
+                                setFlagOfProgress(mCurrentPosition);
+                            }
                         }
 
                         if (mEpisodeIndex + 1 == Integer.parseInt(mTextEpisodeIndex.getText().toString())) {
@@ -769,15 +927,13 @@ public class PlayerActivity extends BaseActivity implements
 
                         playVideo(uriPrehandle(mDetectResult[1]));
                     } else {
-//                        mStateView.setText("detect finished, but none play file link");
                         media.setVisibility(View.INVISIBLE);
-                        Throwable t = new Throwable(data);
+                        Throwable t = new Throwable("3:wrong data format");
                         goBlooey(t);
                     }
                 } else {
-//                    mStateView.setText("detect finished, but none contents");
                     media.setVisibility(View.INVISIBLE);
-                    Throwable t = new Throwable(data);
+                    Throwable t = new Throwable("4:null data from server");
                     goBlooey(t);
                 }
 
@@ -786,9 +942,11 @@ public class PlayerActivity extends BaseActivity implements
             @Override
             public void onFailure(Throwable e, String data) {
                 Log.e(TAG, "detect failed. uri = " + uri);
-                e.printStackTrace();
-                Throwable t = new Throwable(data);
-                goBlooey(t);
+                if (!isPaused) {
+                    // need to check another source
+                    Throwable t = new Throwable("5:detect failed");
+                    goBlooey(t);
+                }
             }
 
         });
@@ -924,42 +1082,6 @@ public class PlayerActivity extends BaseActivity implements
         }
     }
 
-    private Runnable onEverySecond = new Runnable() {
-        public void run() {
-
-            // disappear after reset 3 seconds
-            if (System.currentTimeMillis() - mForwardActionStartTime > mForwardWaitingTime + 3000) {
-                bottomPanel.setVisibility(View.INVISIBLE);
-                mProgresssTextView.setVisibility(View.INVISIBLE);
-            }
-
-            // 设回正在播放的位置
-            if (mForwardFlag && System.currentTimeMillis() - mForwardActionStartTime > mForwardWaitingTime) {
-                mForwardFlag = false;
-                if (mIsM3u8) {
-                    timeline.setProgress(m3u8LastSeekPosition + player.getCurrentPosition() / 1000);
-                } else {
-                    timeline.setProgress(player.getCurrentPosition() / 1000);
-                }
-//                mProgresssTextView.setX(timeline.getSeekBarThumb().getBounds().centerX() + 25);
-                mProgresssTextView.animate().translationX(timeline.getSeekBarThumb().getBounds().centerX() + 25);
-            }
-
-            if (player != null && !mForwardFlag) {
-                if (mIsM3u8) {
-                    timeline.setProgress(m3u8LastSeekPosition + player.getCurrentPosition() / 1000);
-                } else {
-                    timeline.setProgress(player.getCurrentPosition() / 1000);
-                }
-                mProgresssTextView.setText(seconds2TimeString(timeline.getProgress()));
-            }
-
-            if (!isPaused) {
-                surface.postDelayed(onEverySecond, 1000);
-            }
-        }
-    };
-
     /**
      * 清晰度含义： 00111111表示360,480,640,720,1280,1920
      * 1920:蓝光 0x20
@@ -1040,6 +1162,50 @@ public class PlayerActivity extends BaseActivity implements
 
         mQualityPanelHeight = mQualityPanelHeight + mButtonFixedHeight;
     }
+
+    private Runnable onEverySecond = new Runnable() {
+        public void run() {
+
+            // disappear after reset 3 seconds
+            if (System.currentTimeMillis() - mForwardActionStartTime > mForwardWaitingTime + 3000) {
+                bottomPanel.setVisibility(View.INVISIBLE);
+                mProgresssTextView.setVisibility(View.INVISIBLE);
+            }
+
+            // 设回正在播放的位置
+            if (mForwardFlag && System.currentTimeMillis() - mForwardActionStartTime > mForwardWaitingTime) {
+                mForwardFlag = false;
+                if (mIsM3u8) {
+                    timeline.setProgress(m3u8LastSeekPosition + player.getCurrentPosition() / 1000);
+                } else {
+                    timeline.setProgress(player.getCurrentPosition() / 1000);
+                }
+//                mProgresssTextView.setX(timeline.getSeekBarThumb().getBounds().centerX() + 25);
+                mProgresssTextView.animate().translationX(timeline.getSeekBarThumb().getBounds().centerX() + 25);
+            }
+
+            // 正常设置位置
+            if (!isPaused && player != null && !mForwardFlag) {
+
+                if (mIsM3u8) {
+                    timeline.setProgress(m3u8LastSeekPosition + player.getCurrentPosition() / 1000);
+                } else {
+                    timeline.setProgress(player.getCurrentPosition() / 1000);
+                }
+                mProgresssTextView.setText(seconds2TimeString(timeline.getProgress()));
+
+                if (timeline.getSecondaryProgress() < timeline.getProgress()) {
+                    timeline.setSecondaryProgress(timeline.getProgress());
+                }
+
+                mLastPlayPosition = player.getCurrentPosition();
+            }
+
+            if (!isPaused) {
+                surface.postDelayed(onEverySecond, 1000);
+            }
+        }
+    };
 
     private void addNewSubMenuButtonOfSource(Source source) {
         int idStart = 10;
@@ -1232,10 +1398,113 @@ public class PlayerActivity extends BaseActivity implements
 
     private void setFlagOfProgress(int seconds) {
         timeline.setProgress(seconds);
+        mProgresssTextView.setAlpha(1f);
         mProgresssTextView.setText(seconds2TimeString(seconds));
 //                  mProgresssTextView.setX(timeline.getSeekBarThumb().getBounds().centerX() + 25);
+        mProgresssTextView.animate().cancel();
+        mProgresssTextView.animate().setStartDelay(200);
         mProgresssTextView.animate().translationX(timeline.getSeekBarThumb().getBounds().centerX() + 25);
     }
+
+    /**
+     * 返回值 ：
+     * spd:63,,,pre:0,,,state:0,,,buf:364,,,st:-1,,,at:2729
+     * spd:当前速度，63 K/s
+     * pre: 缓冲进度 0-100
+     * state:下载状态 200 下载完成
+     * buf: 缓冲的可以供给播放的秒数  364：还可以播放364秒
+     * st: m3u8 快进后的基础时间  ；
+     * at:视频的总时间
+     */
+    private void getHttpServerState() {
+
+//        if (mProxy == null || mProxy.mHost == null) {
+        if (mHost == null) {
+            Throwable throwable = new Throwable("1:HttpServer is not ready!");
+            goBlooey(throwable);
+            return;
+        }
+
+        int currentProgress = timeline.getProgress();
+
+        final Uri uri = new Uri.Builder().scheme("http")
+                .encodedAuthority(mHost)
+                .encodedPath("/proxy/state")
+                .appendQueryParameter("pauseflag", "0")
+                .appendQueryParameter("seektime", "0")
+                .appendQueryParameter("time", String.valueOf(currentProgress))
+                .build();
+
+        mHttpc.get(uri.toString(), null, new AsyncHttpResponseHandler() {
+            @Override
+            public void onSuccess(String data) {
+//                Log.e(TAG, "get state return contents: " + data);
+                if (data != null) {
+                    String[] stateResult = data.split(",,,");
+                    if (stateResult.length > 5) {
+                        // update duration. Sometime we can not get duration through detect.
+                        // but in this thread, we can reset it.
+                        String[] nameValue = stateResult[5].split(":");
+                        if (nameValue.length > 1) {
+                            mDuration = Integer.parseInt(nameValue[1]);
+                            mDurationTextView.setText(seconds2TimeString(mDuration));
+                            timeline.setMax(mDuration);
+                        }
+
+                        // update second progress
+                        nameValue = stateResult[3].split(":");
+                        if (nameValue.length > 1) {
+                            timeline.setSecondaryProgress(timeline.getProgress() + Integer.parseInt(nameValue[1]));
+                        }
+
+                        // if player stuck, show download speed and bottom panel
+                        if (!mForwardFlag) {
+                            nameValue = stateResult[0].split(":");
+                            if (player != null
+                                    && !isPaused
+                                    && nameValue.length > 1
+                                    && player.getCurrentPosition() - mLastPlayPosition > 3000) {
+                                whereyougo.setText(nameValue[1] + "K/s");
+                                whereyougo.setVisibility(View.VISIBLE);
+                                bottomPanel.setVisibility(View.VISIBLE);
+                                mProgresssTextView.setVisibility(View.VISIBLE);
+                                mWaiting.setVisibility(View.VISIBLE);
+                            } else {
+                                whereyougo.setText("");
+                                whereyougo.setVisibility(View.GONE);
+                                bottomPanel.setVisibility(View.INVISIBLE);
+                                mProgresssTextView.setVisibility(View.INVISIBLE);
+                                mWaiting.setVisibility(View.INVISIBLE);
+                            }
+                        }
+
+                    }
+
+                }
+            }
+
+            @Override
+            public void onFailure(Throwable e, String data) {
+                Log.e(TAG, "get state failed. uri = " + uri);
+            }
+
+        });
+    }
+
+
+    /**
+     * Thread for get http serve state and update ui
+     */
+    private Runnable onEvery3Second = new Runnable() {
+        public void run() {
+
+            getHttpServerState();
+
+            if (!isPaused) {
+                surface.postDelayed(onEvery3Second, 3000);
+            }
+        }
+    };
 
 
 }

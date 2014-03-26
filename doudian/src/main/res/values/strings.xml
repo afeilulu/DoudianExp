@@ -166,4 +166,13 @@
     <string name="quality_1280">超 清</string>
     <string name="quality_1920">蓝 光</string>
 
+    <string name="player_error_0">未知异常</string>
+    <string name="player_error_1">服务器启动失败</string>
+    <string name="player_error_2">影片播放地址不正确</string>
+    <string name="player_error_3">服务器返回错误格式数据</string>
+    <string name="player_error_4">服务器返回数据为空</string>
+    <string name="player_error_5">服务器检测失败</string>
+    <string name="player_error_6">播放器异常</string>
+    <string name="player_error_7">没有本集节目哦</string>
+
 </resources>

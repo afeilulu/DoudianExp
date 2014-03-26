@@ -9,7 +9,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.content.pm.PackageManager.NameNotFoundException;
 import android.database.ContentObserver;
 import android.database.Cursor;
 import android.net.Uri;
@@ -18,7 +17,6 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.provider.Settings;
-import android.provider.Settings.SettingNotFoundException;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -39,59 +37,68 @@ import cn.com.xinli.android.doudian.utils.UpgradePackage;
 import cn.com.xinli.android.doudian.utils.Utils;
 
 public class WelcomeActivity extends Activity {
-	private TextView hint;
-	private ProgressBar progressBar;
-	private WelcomeTask task;
-	private final String TAG = "WelcomeActivity";
-	private DownloadManager dMgr;
-	private long lastDownloadId;
-	private String saveFileName;
-	private String md5;
-	public final static int DOWNLOAD_PROGRESS = 1;
-	private boolean downloadCompleteFlag;
-	private Button btnEnter;
-	private Button btnCanel;
-	private String mErrorCode;
-	private String versionName;
-	private String dateInVersionName;
+    public final static int DOWNLOAD_PROGRESS = 1;
+    private final String TAG = "WelcomeActivity";
+    private TextView hint;
+    private ProgressBar progressBar;
+    private WelcomeTask task;
+    private DownloadManager dMgr;
+    private long lastDownloadId;
+    private String saveFileName;
+    private String md5;
+    private boolean downloadCompleteFlag;
+    private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Bundle extras = intent.getExtras();
+            Log.i(TAG, "下载升级包完成！");
+            downloadCompleteFlag = true;
+        }
 
-	private AutoTimeObserver autoTimeObserver = new AutoTimeObserver(
-			new Handler());
+    };
+    private Button btnEnter;
+    private Button btnCanel;
+    private String mErrorCode;
+    private String versionName;
+    private String dateInVersionName;
+    private AutoTimeObserver autoTimeObserver = new AutoTimeObserver(
+            new Handler());
 
-	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		setContentView(R.layout.welcome);
-		hint = (TextView) findViewById(R.id.hint);
-		progressBar = (ProgressBar) findViewById(R.id.progress);
-		btnEnter = (Button) findViewById(R.id.btn_enter);
-		btnEnter.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				// finish();
-				installIntent(WelcomeActivity.this);
-			}
-		});
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.welcome);
+        hint = (TextView) findViewById(R.id.hint);
+        progressBar = (ProgressBar) findViewById(R.id.progress);
+        btnEnter = (Button) findViewById(R.id.btn_enter);
+        btnEnter.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // finish();
+                installIntent(WelcomeActivity.this);
+            }
+        });
 
-		btnCanel = (Button) findViewById(R.id.btn_canel);
-		btnCanel.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				Log.i(TAG, "btnCanel==");
+        btnCanel = (Button) findViewById(R.id.btn_canel);
+        btnCanel.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.i(TAG, "btnCanel==");
 
-				goHome();
-			}
-		});
+                goHome();
+            }
+        });
 
-		registerReceiver(mReceiver, new IntentFilter(
-				DownloadManager.ACTION_DOWNLOAD_COMPLETE));
+        registerReceiver(mReceiver, new IntentFilter(
+                DownloadManager.ACTION_DOWNLOAD_COMPLETE));
 
-		getContentResolver()
-				.registerContentObserver(
-						android.provider.Settings.System
-								.getUriFor(Settings.System.AUTO_TIME),
-						true, autoTimeObserver);
-		try {
+        getContentResolver()
+                .registerContentObserver(
+                        android.provider.Settings.System
+                                .getUriFor(Settings.System.AUTO_TIME),
+                        true, autoTimeObserver
+                );
+        /*try {
 			versionName = getPackageManager().getPackageInfo(getPackageName(),
 					0).versionName;
 			String[] dateStrings = versionName.split(" ");
@@ -144,408 +151,405 @@ public class WelcomeActivity extends Activity {
 			}
 		} catch (NameNotFoundException e) {
 			finish();
-		}
-	}
+		}*/
+        goHome();
+    }
 
-	@Override
-	protected void onDestroy() {
-		// TODO Auto-generated method stub
-		super.onDestroy();
-		getContentResolver().unregisterContentObserver(autoTimeObserver);
-		unregisterReceiver(mReceiver);
-	}
+    @Override
+    protected void onDestroy() {
+        // TODO Auto-generated method stub
+        super.onDestroy();
+        getContentResolver().unregisterContentObserver(autoTimeObserver);
+        unregisterReceiver(mReceiver);
+    }
 
-	private class WelcomeTask extends AsyncTask<Context, String, Integer> {
+    private void goHome() {
+        Intent intent = new Intent(this, HomeBlueActivity.class);
+        startActivity(intent);
+        finish();
+    }
 
-		private Context context;
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        // TODO Auto-generated method stub
+        super.onActivityResult(requestCode, resultCode, data);
+        Log.i(TAG, "onActivityResult==resultCode=" + resultCode
+                + "==requestCode==" + requestCode);
 
-		@Override
-		protected Integer doInBackground(Context... params) {
-			int result = 0;
-			context = params[0];
-			Utils utils = new Utils(context);
-			publishProgress(
-					getResources().getString(R.string.checking_network), "10");
-			boolean network = utils.checkNetworkInfo();
-			if (network) {
-				publishProgress(getResources()
-						.getString(R.string.checking_auth), "20");
-				String mac = "";
+    }
 
-				/**
-				 * 增加升级开始
-				 */
-				publishProgress(
-						getResources().getString(R.string.checking_pgrade),
-						"30");
-				String[] checkInfo = checkUpdateVersion(mac);
-				if (checkInfo == null) {
-					publishProgress(getResources()
-							.getString(R.string.no_pgrade), "100");
-					result = 1;
-				} else {
-					publishProgress(
-							getResources().getString(R.string.ready_download),
-							"50");
-					Log.d(TAG, "------------apkUrl----------:" + checkInfo[1]
-							+ "==md5==" + checkInfo[0]);
+    private void addTask(String[] checkInfo) {
+        try {
+            Log.d(TAG, "download uri = " + checkInfo[1]);
+            Uri uri = Uri.parse(checkInfo[1]);
+            String[] urlSplit = checkInfo[1].split("/");
+            saveFileName = urlSplit[urlSplit.length - 1];
+            Log.i(TAG, "saveFileName="
+                    + Environment.getExternalStorageDirectory().getPath()
+                    + "/Download/" + saveFileName);
+            File file = new File(Environment.getExternalStorageDirectory()
+                    .getPath() + "/Download/" + saveFileName);
+            if (file.exists())
+                file.delete();
 
-					addTask(checkInfo);
-					// 监听下载进度
-					// handler.sendEmptyMessage(DOWNLOAD_PROGRESS);
+            DownloadManager.Request dmReq = new DownloadManager.Request(uri);
+            dmReq.setTitle(saveFileName);
+            dmReq.setDescription("Download for Update apk");
+            Log.i(TAG, "Environment.DIRECTORY_DOWNLOADS="
+                    + Environment.DIRECTORY_DOWNLOADS + ",saveFileName="
+                    + saveFileName);
+            dmReq.setDestinationInExternalPublicDir(
+                    Environment.DIRECTORY_DOWNLOADS, saveFileName);
+            lastDownloadId = dMgr.enqueue(dmReq);
+            Log.i(TAG, "lastDownloadId=" + lastDownloadId);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
-					Query myDownloadQuery = new Query();
-					myDownloadQuery.setFilterById(lastDownloadId);
-					Cursor cursor = null;
-					long currTime = System.currentTimeMillis();
+    }
 
-					long consuming = 0;
-					while (true) {
-						consuming = (System.currentTimeMillis() - currTime) / 1000 / 60;
+    private boolean checkMd5() {
+        try {
 
-						if (consuming >= 30) {
+            // return true;
 
-							publishProgress(
-									getResources().getString(
-											R.string.download_timeout), "100");
-							result = 1;
-							break;
-						}
-						try {
-							Thread.sleep(2000);
-						} catch (InterruptedException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
+            if (!TextUtils.isEmpty(md5)
+                    && !MD5.checkMd5(md5, Environment
+                    .getExternalStorageDirectory().getPath()
+                    + "/Download/" + saveFileName)) {
+                Log.d(TAG, "md5 check failed");
+                return false;
+            } else {
+                return true;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return true;
+        }
 
-						cursor = dMgr.query(myDownloadQuery);
+    }
 
-						if (cursor != null && cursor.moveToFirst()) {
-							int _id = cursor
-									.getColumnIndex(DownloadManager.COLUMN_ID);
-							int _name = cursor
-									.getColumnIndex(DownloadManager.COLUMN_LOCAL_FILENAME);
-							int _total = cursor
-									.getColumnIndex(DownloadManager.COLUMN_TOTAL_SIZE_BYTES);
-							int _size = cursor
-									.getColumnIndex(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR);
-							long id = cursor.getLong(_id);
-							String name = cursor.getString(_name);
-							long total = cursor.getLong(_total);
-							long size = cursor.getLong(_size);
-							int _status = cursor
-									.getColumnIndex(DownloadManager.COLUMN_STATUS);
-							int status = cursor.getInt(_status);
-							double progress = ((double) size / (double) total) * 100;
-							if (progress < 1)
-								progress = 1;
-							java.text.DecimalFormat df = new java.text.DecimalFormat(
-									"#");
-							Log.d(TAG,
-									"download status = df.format(progress)=="
-											+ df.format(progress));
+    private void installIntent(Context context) {
+        try {
+            Log.i(TAG, "installIntent=Environment.DIRECTORY_DOWNLOADS=="
+                    + Environment.getExternalStorageDirectory().getPath()
+                    + "/Download/,saveFileName=" + saveFileName);
+            File apkfile = new File(Environment.getExternalStorageDirectory()
+                    .getPath() + "/Download/" + saveFileName);
+            if (!apkfile.exists()) {
+                Log.d(TAG, "下载文件未找到");
+            }
+            Log.i(TAG,
+                    "installIntent=apkfile==" + "file://" + apkfile.toString());
 
-							publishProgress(
-									getResources().getString(
-											R.string.downloading)
-											+ df.format(progress)
-											+ getResources().getString(
-													R.string.waiting),
-									String.valueOf(df.format(progress)));
+            Uri uri = Uri.parse("file://" + apkfile.toString());
+            Intent intentInstall = new Intent(Intent.ACTION_VIEW);
+            // be careful of this flag
+            intentInstall.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            intentInstall.setDataAndType(uri,
+                    "application/vnd.android.package-archive");
+            // startActivity(intentInstall);
+            startActivityForResult(intentInstall, 0);
 
-							if (status == DownloadManager.STATUS_SUCCESSFUL) {
-								if (checkMd5()) {// md5验证通过
-									publishProgress(
-											getResources().getString(
-													R.string.down_success),
-											"100");
-									result = 2;
-									break;
-								} else {
-									publishProgress(
-											getResources().getString(
-													R.string.down_failure),
-											"100");
-									result = 1;
-									break;
-								}
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
-							}
+    }
 
-						}
-					}
+    public void tastStatus(long lastDownloadId) {
+        Query myDownloadQuery = new Query();
+        myDownloadQuery.setFilterById(lastDownloadId);
+        Cursor cursor = dMgr.query(myDownloadQuery);
+        if (cursor != null && cursor.moveToFirst()) {
+            int _id = cursor.getColumnIndex(DownloadManager.COLUMN_ID);
+            int _name = cursor
+                    .getColumnIndex(DownloadManager.COLUMN_LOCAL_FILENAME);
+            int _total = cursor
+                    .getColumnIndex(DownloadManager.COLUMN_TOTAL_SIZE_BYTES);
+            int _size = cursor
+                    .getColumnIndex(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR);
+            long id = cursor.getLong(_id);
+            String name = cursor.getString(_name);
+            long total = cursor.getLong(_total);
+            long size = cursor.getLong(_size);
 
-				}
+            Log.i(TAG,
+                    "name="
+                            + name
+                            + ",size="
+                            + size
+                            + ",total="
+                            + total
+                            + "==status"
+                            + cursor.getColumnIndex(DownloadManager.COLUMN_STATUS)
+            );
 
-			} else {
-				publishProgress(
-						getResources().getString(R.string.chk_network_err),
-						"50");
-			}
-			return result;
-		}
+            Log.i(TAG, "下载" + size / total + "%");
+            hint.setText(getResources().getString(R.string.downloading) + size
+                    / total + getResources().getString(R.string.waiting));
+        }
 
-		@Override
-		protected void onPostExecute(Integer result) {
-			if (result.intValue() == 0) {
-				// finish();
-			} else if (result.intValue() == 1) {
-				goHome();
-			} else {
-				btnEnter.setVisibility(View.VISIBLE);
-				btnCanel.setVisibility(View.VISIBLE);
-				btnEnter.setFocusable(true);
-				btnEnter.setFocusableInTouchMode(true);
-				btnEnter.requestFocus();
-			}
+    }
 
-		}
+    /**
+     * 检查有没有升级包
+     *
+     * @return null 没有升级包
+     */
+    private String[] checkUpdateVersion(String mac) {
+        try {
+            int currentVersion = getCurrentVersion();
+            Log.i(TAG, "currentVersion==" + currentVersion);
 
-		@Override
-		protected void onProgressUpdate(String... values) {
-			// TODO Auto-generated method stub
-			hint.setText(values[0]);
-			progressBar.setProgress(Integer.parseInt(values[1]));
-		}
+            if (currentVersion <= 0) {
+                return null;
+            }
 
-	}
+            UpgradePackage upgradePackage = Authenticate.getUpgradePackages(
+                    currentVersion, mac);
+            if (upgradePackage != null) {
+                Log.i(TAG, "upgradePackage != null");
+                int version = upgradePackage.getCurVersion();
+                Log.i(TAG, "upgradePackage=" + version);
 
-	private void goHome() {
-		Intent intent = new Intent(this, HomeBlueActivity.class);
-		startActivity(intent);
-		finish();
-	}
+                if (currentVersion >= version) {
+                    Log.i(TAG, "currentVersion >= version");
+                    return null;
+                } else {
+                    md5 = upgradePackage.getMd5();
+                    String apkUrl = "";
+                    if (upgradePackage.getPackages() != null)
+                        apkUrl = Authenticate.UPDATEAPKHOST
+                                + upgradePackage.getPackages();
+                    else
+                        apkUrl = null;
+                    Log.i(TAG, "apkUrl==" + apkUrl + ",packages="
+                            + upgradePackage.getPackages());
 
-	@Override
-	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		// TODO Auto-generated method stub
-		super.onActivityResult(requestCode, resultCode, data);
-		Log.i(TAG, "onActivityResult==resultCode=" + resultCode
-				+ "==requestCode==" + requestCode);
+                    String description = upgradePackage.getAnnouncement();
 
-	}
+                    String[] checkInfo = new String[4];
+                    checkInfo[0] = md5;
+                    checkInfo[1] = apkUrl;
+                    checkInfo[2] = description;
+                    checkInfo[3] = String.valueOf(version);
+                    return checkInfo;
+                }
+            } else {
+                Log.i(TAG, "upgradePackage == null=");
+                return null;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 
-	private void addTask(String[] checkInfo) {
-		try {
-			Log.d(TAG, "download uri = " + checkInfo[1]);
-			Uri uri = Uri.parse(checkInfo[1]);
-			String[] urlSplit = checkInfo[1].split("/");
-			saveFileName = urlSplit[urlSplit.length - 1];
-			Log.i(TAG, "saveFileName="
-					+ Environment.getExternalStorageDirectory().getPath()
-					+ "/Download/" + saveFileName);
-			File file = new File(Environment.getExternalStorageDirectory()
-					.getPath() + "/Download/" + saveFileName);
-			if (file.exists())
-				file.delete();
+    private int getCurrentVersion() {
+        try {
+            PackageManager pm = getPackageManager();
+            PackageInfo pinfo = pm.getPackageInfo(getPackageName(),
+                    PackageManager.GET_CONFIGURATIONS);
+            return pinfo.versionCode;// 获取在AndroidManifest.xml中配置的版本号
 
-			DownloadManager.Request dmReq = new DownloadManager.Request(uri);
-			dmReq.setTitle(saveFileName);
-			dmReq.setDescription("Download for Update apk");
-			Log.i(TAG, "Environment.DIRECTORY_DOWNLOADS="
-					+ Environment.DIRECTORY_DOWNLOADS + ",saveFileName="
-					+ saveFileName);
-			dmReq.setDestinationInExternalPublicDir(
-					Environment.DIRECTORY_DOWNLOADS, saveFileName);
-			lastDownloadId = dMgr.enqueue(dmReq);
-			Log.i(TAG, "lastDownloadId=" + lastDownloadId);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+        } catch (PackageManager.NameNotFoundException e) {
+            e.fillInStackTrace();
+            return 0;
+        }
+    }
 
-	}
+    private class WelcomeTask extends AsyncTask<Context, String, Integer> {
 
-	private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
-		@Override
-		public void onReceive(Context context, Intent intent) {
-			Bundle extras = intent.getExtras();
-			Log.i(TAG, "下载升级包完成！");
-			downloadCompleteFlag = true;
-		}
+        private Context context;
 
-	};
+        @Override
+        protected Integer doInBackground(Context... params) {
+            int result = 0;
+            context = params[0];
+            Utils utils = new Utils(context);
+            publishProgress(
+                    getResources().getString(R.string.checking_network), "10");
+            boolean network = utils.checkNetworkInfo();
+            if (network) {
+                publishProgress(getResources()
+                        .getString(R.string.checking_auth), "20");
+                String mac = "";
 
-	private boolean checkMd5() {
-		try {
+                /**
+                 * 增加升级开始
+                 */
+                publishProgress(
+                        getResources().getString(R.string.checking_pgrade),
+                        "30");
+                String[] checkInfo = checkUpdateVersion(mac);
+                if (checkInfo == null) {
+                    publishProgress(getResources()
+                            .getString(R.string.no_pgrade), "100");
+                    result = 1;
+                } else {
+                    publishProgress(
+                            getResources().getString(R.string.ready_download),
+                            "50");
+                    Log.d(TAG, "------------apkUrl----------:" + checkInfo[1]
+                            + "==md5==" + checkInfo[0]);
 
-			// return true;
+                    addTask(checkInfo);
+                    // 监听下载进度
+                    // handler.sendEmptyMessage(DOWNLOAD_PROGRESS);
 
-			if (!TextUtils.isEmpty(md5)
-					&& !MD5.checkMd5(md5, Environment
-							.getExternalStorageDirectory().getPath()
-							+ "/Download/" + saveFileName)) {
-				Log.d(TAG, "md5 check failed");
-				return false;
-			} else {
-				return true;
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			return true;
-		}
+                    Query myDownloadQuery = new Query();
+                    myDownloadQuery.setFilterById(lastDownloadId);
+                    Cursor cursor = null;
+                    long currTime = System.currentTimeMillis();
 
-	}
+                    long consuming = 0;
+                    while (true) {
+                        consuming = (System.currentTimeMillis() - currTime) / 1000 / 60;
 
-	private void installIntent(Context context) {
-		try {
-			Log.i(TAG, "installIntent=Environment.DIRECTORY_DOWNLOADS=="
-					+ Environment.getExternalStorageDirectory().getPath()
-					+ "/Download/,saveFileName=" + saveFileName);
-			File apkfile = new File(Environment.getExternalStorageDirectory()
-					.getPath() + "/Download/" + saveFileName);
-			if (!apkfile.exists()) {
-				Log.d(TAG, "下载文件未找到");
-			}
-			Log.i(TAG,
-					"installIntent=apkfile==" + "file://" + apkfile.toString());
+                        if (consuming >= 30) {
 
-			Uri uri = Uri.parse("file://" + apkfile.toString());
-			Intent intentInstall = new Intent(Intent.ACTION_VIEW);
-			// be careful of this flag
-			intentInstall.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-			intentInstall.setDataAndType(uri,
-					"application/vnd.android.package-archive");
-			// startActivity(intentInstall);
-			startActivityForResult(intentInstall, 0);
+                            publishProgress(
+                                    getResources().getString(
+                                            R.string.download_timeout), "100"
+                            );
+                            result = 1;
+                            break;
+                        }
+                        try {
+                            Thread.sleep(2000);
+                        } catch (InterruptedException e) {
+                            // TODO Auto-generated catch block
+                            e.printStackTrace();
+                        }
 
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+                        cursor = dMgr.query(myDownloadQuery);
 
-	}
+                        if (cursor != null && cursor.moveToFirst()) {
+                            int _id = cursor
+                                    .getColumnIndex(DownloadManager.COLUMN_ID);
+                            int _name = cursor
+                                    .getColumnIndex(DownloadManager.COLUMN_LOCAL_FILENAME);
+                            int _total = cursor
+                                    .getColumnIndex(DownloadManager.COLUMN_TOTAL_SIZE_BYTES);
+                            int _size = cursor
+                                    .getColumnIndex(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR);
+                            long id = cursor.getLong(_id);
+                            String name = cursor.getString(_name);
+                            long total = cursor.getLong(_total);
+                            long size = cursor.getLong(_size);
+                            int _status = cursor
+                                    .getColumnIndex(DownloadManager.COLUMN_STATUS);
+                            int status = cursor.getInt(_status);
+                            double progress = ((double) size / (double) total) * 100;
+                            if (progress < 1)
+                                progress = 1;
+                            java.text.DecimalFormat df = new java.text.DecimalFormat(
+                                    "#");
+                            Log.d(TAG,
+                                    "download status = df.format(progress)=="
+                                            + df.format(progress)
+                            );
 
-	public void tastStatus(long lastDownloadId) {
-		Query myDownloadQuery = new Query();
-		myDownloadQuery.setFilterById(lastDownloadId);
-		Cursor cursor = dMgr.query(myDownloadQuery);
-		if (cursor != null && cursor.moveToFirst()) {
-			int _id = cursor.getColumnIndex(DownloadManager.COLUMN_ID);
-			int _name = cursor
-					.getColumnIndex(DownloadManager.COLUMN_LOCAL_FILENAME);
-			int _total = cursor
-					.getColumnIndex(DownloadManager.COLUMN_TOTAL_SIZE_BYTES);
-			int _size = cursor
-					.getColumnIndex(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR);
-			long id = cursor.getLong(_id);
-			String name = cursor.getString(_name);
-			long total = cursor.getLong(_total);
-			long size = cursor.getLong(_size);
+                            publishProgress(
+                                    getResources().getString(
+                                            R.string.downloading)
+                                            + df.format(progress)
+                                            + getResources().getString(
+                                            R.string.waiting),
+                                    String.valueOf(df.format(progress))
+                            );
 
-			Log.i(TAG,
-					"name="
-							+ name
-							+ ",size="
-							+ size
-							+ ",total="
-							+ total
-							+ "==status"
-							+ cursor.getColumnIndex(DownloadManager.COLUMN_STATUS));
+                            if (status == DownloadManager.STATUS_SUCCESSFUL) {
+                                if (checkMd5()) {// md5验证通过
+                                    publishProgress(
+                                            getResources().getString(
+                                                    R.string.down_success),
+                                            "100"
+                                    );
+                                    result = 2;
+                                    break;
+                                } else {
+                                    publishProgress(
+                                            getResources().getString(
+                                                    R.string.down_failure),
+                                            "100"
+                                    );
+                                    result = 1;
+                                    break;
+                                }
 
-			Log.i(TAG, "下载" + size / total + "%");
-			hint.setText(getResources().getString(R.string.downloading) + size
-					/ total + getResources().getString(R.string.waiting));
-		}
+                            }
 
-	}
+                        }
+                    }
 
-	/**
-	 * 检查有没有升级包
-	 * 
-	 * @return null 没有升级包
-	 */
-	private String[] checkUpdateVersion(String mac) {
-		try {
-			int currentVersion = getCurrentVersion();
-			Log.i(TAG, "currentVersion==" + currentVersion);
+                }
 
-			if (currentVersion <= 0) {
-				return null;
-			}
+            } else {
+                publishProgress(
+                        getResources().getString(R.string.chk_network_err),
+                        "50");
+            }
+            return result;
+        }
 
-			UpgradePackage upgradePackage = Authenticate.getUpgradePackages(
-					currentVersion, mac);
-			if (upgradePackage != null) {
-				Log.i(TAG, "upgradePackage != null");
-				int version = upgradePackage.getCurVersion();
-				Log.i(TAG, "upgradePackage=" + version);
+        @Override
+        protected void onPostExecute(Integer result) {
+            if (result.intValue() == 0) {
+                // finish();
+            } else if (result.intValue() == 1) {
+                goHome();
+            } else {
+                btnEnter.setVisibility(View.VISIBLE);
+                btnCanel.setVisibility(View.VISIBLE);
+                btnEnter.setFocusable(true);
+                btnEnter.setFocusableInTouchMode(true);
+                btnEnter.requestFocus();
+            }
 
-				if (currentVersion >= version) {
-					Log.i(TAG, "currentVersion >= version");
-					return null;
-				} else {
-					md5 = upgradePackage.getMd5();
-					String apkUrl = "";
-					if (upgradePackage.getPackages() != null)
-						apkUrl = Authenticate.UPDATEAPKHOST
-								+ upgradePackage.getPackages();
-					else
-						apkUrl = null;
-					Log.i(TAG, "apkUrl==" + apkUrl + ",packages="
-							+ upgradePackage.getPackages());
+        }
 
-					String description = upgradePackage.getAnnouncement();
+        @Override
+        protected void onProgressUpdate(String... values) {
+            // TODO Auto-generated method stub
+            hint.setText(values[0]);
+            progressBar.setProgress(Integer.parseInt(values[1]));
+        }
 
-					String[] checkInfo = new String[4];
-					checkInfo[0] = md5;
-					checkInfo[1] = apkUrl;
-					checkInfo[2] = description;
-					checkInfo[3] = String.valueOf(version);
-					return checkInfo;
-				}
-			} else {
-				Log.i(TAG, "upgradePackage == null=");
-				return null;
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			return null;
-		}
-	}
+    }
 
-	private int getCurrentVersion() {
-		try {
-			PackageManager pm = getPackageManager();
-			PackageInfo pinfo = pm.getPackageInfo(getPackageName(),
-					PackageManager.GET_CONFIGURATIONS);
-			return pinfo.versionCode;// 获取在AndroidManifest.xml中配置的版本号
+    public class AutoTimeObserver extends ContentObserver {
 
-		} catch (PackageManager.NameNotFoundException e) {
-			e.fillInStackTrace();
-			return 0;
-		}
-	}
+        public AutoTimeObserver(Handler handler) {
+            super(handler);
+        }
 
-	public class AutoTimeObserver extends ContentObserver {
+        @Override
+        public void onChange(boolean selfChange) {
+            super.onChange(selfChange);
+            Log.d("aaaa", "selfchange = " + selfChange);
+            DateCompare dateCompare = new DateCompare(dateInVersionName);
+            if (dateCompare.isExpired()) {
+                Toast.makeText(WelcomeActivity.this, R.string.expired_tip,
+                        Toast.LENGTH_LONG).show();
+                finish();
+            } else {
+                String tmpStr = getString(R.string.expired_on,
+                        dateInVersionName);
+                Toast.makeText(WelcomeActivity.this, tmpStr, Toast.LENGTH_LONG)
+                        .show();
 
-		public AutoTimeObserver(Handler handler) {
-			super(handler);
-		}
+                progressBar.setVisibility(View.INVISIBLE);
+                progressBar.postDelayed(new Runnable() {
 
-		@Override
-		public void onChange(boolean selfChange) {
-			super.onChange(selfChange);
-			Log.d("aaaa", "selfchange = " + selfChange);
-			DateCompare dateCompare = new DateCompare(dateInVersionName);
-			if (dateCompare.isExpired()) {
-				Toast.makeText(WelcomeActivity.this, R.string.expired_tip,
-						Toast.LENGTH_LONG).show();
-				finish();
-			} else {
-				String tmpStr = getString(R.string.expired_on,
-						dateInVersionName);
-				Toast.makeText(WelcomeActivity.this, tmpStr, Toast.LENGTH_LONG)
-						.show();
+                    @Override
+                    public void run() {
+                        goHome();
 
-				progressBar.setVisibility(View.INVISIBLE);
-				progressBar.postDelayed(new Runnable() {
-
-					@Override
-					public void run() {
-						goHome();
-
-					}
-				}, 3000);
-			}
-		}
-	}
+                    }
+                }, 3000);
+            }
+        }
+    }
 }
