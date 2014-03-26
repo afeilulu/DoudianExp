@@ -360,6 +360,9 @@ public class PlayerActivity extends BaseActivity implements
 
         setUpSubMenuSources();
         sourceButton.requestFocus();
+
+        // Avoiding Clipping when Animating a View on top of a SurfaceView
+        ((ViewGroup) surface.getParent()).addView(new View(this));
     }
 
     @Override
@@ -862,42 +865,6 @@ public class PlayerActivity extends BaseActivity implements
 
     }
 
-    private Runnable onEverySecond = new Runnable() {
-        public void run() {
-
-            // disappear after reset 3 seconds
-            if (System.currentTimeMillis() - mForwardActionStartTime > mForwardWaitingTime + 3000) {
-                bottomPanel.setVisibility(View.INVISIBLE);
-                mProgresssTextView.setVisibility(View.INVISIBLE);
-            }
-
-            // 设回正在播放的位置
-            if (mForwardFlag && System.currentTimeMillis() - mForwardActionStartTime > mForwardWaitingTime) {
-                mForwardFlag = false;
-                if (mIsM3u8) {
-                    timeline.setProgress(m3u8LastSeekPosition + player.getCurrentPosition() / 1000);
-                } else {
-                    timeline.setProgress(player.getCurrentPosition() / 1000);
-                }
-//                mProgresssTextView.setX(timeline.getSeekBarThumb().getBounds().centerX() + 25);
-                mProgresssTextView.animate().translationX(timeline.getSeekBarThumb().getBounds().centerX() + 25);
-            }
-
-            if (player != null && !mForwardFlag) {
-                if (mIsM3u8) {
-                    timeline.setProgress(m3u8LastSeekPosition + player.getCurrentPosition() / 1000);
-                } else {
-                    timeline.setProgress(player.getCurrentPosition() / 1000);
-                }
-                mProgresssTextView.setText(seconds2TimeString(timeline.getProgress()));
-            }
-
-            if (!isPaused) {
-                surface.postDelayed(onEverySecond, 1000);
-            }
-        }
-    };
-
     /**
      * sample:
      * hd=3,hdAll=8,startTime=0,endTime=150,duration=2729,sitename=qq
@@ -956,6 +923,42 @@ public class PlayerActivity extends BaseActivity implements
             mLocalVideos.add(localVideoInfo);
         }
     }
+
+    private Runnable onEverySecond = new Runnable() {
+        public void run() {
+
+            // disappear after reset 3 seconds
+            if (System.currentTimeMillis() - mForwardActionStartTime > mForwardWaitingTime + 3000) {
+                bottomPanel.setVisibility(View.INVISIBLE);
+                mProgresssTextView.setVisibility(View.INVISIBLE);
+            }
+
+            // 设回正在播放的位置
+            if (mForwardFlag && System.currentTimeMillis() - mForwardActionStartTime > mForwardWaitingTime) {
+                mForwardFlag = false;
+                if (mIsM3u8) {
+                    timeline.setProgress(m3u8LastSeekPosition + player.getCurrentPosition() / 1000);
+                } else {
+                    timeline.setProgress(player.getCurrentPosition() / 1000);
+                }
+//                mProgresssTextView.setX(timeline.getSeekBarThumb().getBounds().centerX() + 25);
+                mProgresssTextView.animate().translationX(timeline.getSeekBarThumb().getBounds().centerX() + 25);
+            }
+
+            if (player != null && !mForwardFlag) {
+                if (mIsM3u8) {
+                    timeline.setProgress(m3u8LastSeekPosition + player.getCurrentPosition() / 1000);
+                } else {
+                    timeline.setProgress(player.getCurrentPosition() / 1000);
+                }
+                mProgresssTextView.setText(seconds2TimeString(timeline.getProgress()));
+            }
+
+            if (!isPaused) {
+                surface.postDelayed(onEverySecond, 1000);
+            }
+        }
+    };
 
     /**
      * 清晰度含义： 00111111表示360,480,640,720,1280,1920
@@ -1030,7 +1033,7 @@ public class PlayerActivity extends BaseActivity implements
         if (quality == mHd) {
             button.setBackgroundResource(R.drawable.player_menu_button_selected);
         }
-        button.setAlpha(0.7f);
+//        button.setAlpha(0.7f);
         button.setId(idStart++);
 
         ((ViewGroup) qualityPanel).addView(button);
